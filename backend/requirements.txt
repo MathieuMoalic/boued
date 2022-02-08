@@ -10,6 +10,7 @@ python-dotenv==0.19.2
 PyYAML==6.0
 sniffio==1.2.0
 starlette==0.17.1
+tinydb==4.6.1
 typing-extensions==4.0.1
 uvicorn==0.17.4
 uvloop==0.16.0
