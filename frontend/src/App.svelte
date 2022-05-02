@@ -51,7 +51,7 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 400;
     padding-bottom: 100%;
-    background-image: url("background.png");
+    /* background-image: url("background.png"); */
   }
   form {
     display: flex;

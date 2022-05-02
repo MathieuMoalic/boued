@@ -1,0 +1,30 @@
+version: "3.3"
+services:
+  groceries-frontend:
+    build: ./frontend/
+    image: groceries-frontend
+    container_name: groceries-frontend
+    ports:
+      - 5000:5000
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.groceries-router.entrypoints=web,websecure"
+      - "traefik.http.routers.groceries-router.rule=Host(`groceries.matmoa.xyz`)"
+      - "traefik.http.routers.groceries-router.tls=true"
+      - "traefik.http.routers.groceries-router.tls.certresolver=production"
+  groceries-backend:
+    build: ./backend/
+    image: groceries-backend
+    container_name: groceries-backend
+    ports:
+      - 5001:5001
+    # labels:
+    #   - "traefik.enable=true"
+    #   - "traefik.http.routers.groceries-api-router.entrypoints=web,websecure"
+    #   - "traefik.http.routers.groceries-api-router.rule=Host(`groceriesapi.matmoa.xyz`)"
+    #   - "traefik.http.routers.groceries-api-router.tls=true"
+    #   - "traefik.http.routers.groceries-api-router.tls.certresolver=production"
+networks:
+  default:
+    external: true
+    name: proxy
