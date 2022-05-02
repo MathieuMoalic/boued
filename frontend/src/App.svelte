@@ -1,22 +1,26 @@
-<script lang="ts">
+<script>
   import { onMount } from "svelte";
-  import { getItems, deleteItem, postItem } from "./Crud";
+
+  let api = "https://groceriesapi.matmoa.xyz";
   let newWord = "";
+  let items = [];
 
   let addItem = async () => {
     if (newWord != "") {
-      items = await postItem(newWord);
+      let res = await fetch(api + "/" + newWord, { method: "post" });
+      items = await res.json();
       newWord = "";
     }
   };
 
-  let removeItem = async (id: number) => {
-    items = await deleteItem(id);
+  let removeItem = async (id) => {
+    let res = await fetch(api + "/" + id, { method: "delete" });
+    items = await res.json();
   };
 
-  let items = [];
   onMount(async () => {
-    items = await getItems();
+    let res = await fetch(api);
+    items = await res.json();
   });
 </script>
 
@@ -25,7 +29,7 @@
     <input bind:value={newWord} placeholder=" Add item" />
   </form>
   <div>
-    {#each items as item}
+    {#each items.reverse() as item}
       <div class="item">
         <button
           type="submit"
@@ -51,7 +55,8 @@
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 400;
     padding-bottom: 100%;
-    /* background-image: url("background.png"); */
+    background-image: url("/background.png");
+    background-attachment: fixed;
   }
   form {
     display: flex;

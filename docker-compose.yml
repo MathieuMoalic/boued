@@ -18,12 +18,14 @@ services:
     container_name: groceries-backend
     ports:
       - 5001:5001
-    # labels:
-    #   - "traefik.enable=true"
-    #   - "traefik.http.routers.groceries-api-router.entrypoints=web,websecure"
-    #   - "traefik.http.routers.groceries-api-router.rule=Host(`groceriesapi.matmoa.xyz`)"
-    #   - "traefik.http.routers.groceries-api-router.tls=true"
-    #   - "traefik.http.routers.groceries-api-router.tls.certresolver=production"
+    volumes:
+      - /home/mat/docker/groceries-app/backend/db.json:/app/db.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.groceries-api-router.entrypoints=web,websecure"
+      - "traefik.http.routers.groceries-api-router.rule=Host(`groceriesapi.matmoa.xyz`)"
+      - "traefik.http.routers.groceries-api-router.tls=true"
+      - "traefik.http.routers.groceries-api-router.tls.certresolver=production"
 networks:
   default:
     external: true
