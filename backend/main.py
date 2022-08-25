@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from tinydb import TinyDB, Query
 
 app = FastAPI(title="Groceries API")
-db = TinyDB("./db.json")
+db = TinyDB(f"./db.json")
 
 app.add_middleware(
     CORSMiddleware,
@@ -13,23 +13,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def flip(list1:list):
+    return sorted(list1,key=lambda x:x["id"],reverse=True)
 
-@app.get("/")
+@app.get("/api")
 async def get_items():
-    return db.all()
+    return flip(db.all())
 
 
-@app.delete("/{item_id}")
+@app.delete("/api/{item_id}")
 async def delete_item(item_id: int):
-    out = db.search(Query().id == item_id)
-    if len(out) == 1:
-        db.remove(Query().id == item_id)
-    return db.all()
+    db.remove(Query().id == item_id)
+    return flip(db.all())
 
 
-@app.post("/{item_name}")
+@app.post("/api/{item_name}")
 async def add_item(item_name: str):
     for item_id in range(256):
         if len(db.search(Query().id == item_id)) == 0:
             db.insert({"id": item_id, "name": item_name})
-            return db.all()
+            return flip(db.all())

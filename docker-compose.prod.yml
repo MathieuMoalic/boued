@@ -1,0 +1,35 @@
+version: "3.3"
+services:
+  groceries-frontend-prod:
+    build:
+      context: ./frontend/
+      dockerfile: prod.Dockerfile
+    image: groceries-frontend-prod
+    restart: unless-stopped
+    container_name: groceries-frontend-prod
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.groceries.entrypoints=web,websecure"
+      - "traefik.http.routers.groceries.rule=Host(`groceries.matmoa.xyz`)"
+      - "traefik.http.routers.groceries.tls=true"
+      - "traefik.http.routers.groceries.tls.certresolver=production"
+      - "traefik.http.routers.groceries.middlewares=authelia@file"
+  groceries-backend-prod:
+    build:
+      context: ./backend/
+      dockerfile: prod.Dockerfile
+    image: groceries-backend-prod
+    restart: unless-stopped
+    container_name: groceries-backend-prod
+    volumes:
+      - /home/mat/docker/groceries-app/backend/db_prod.json:/app/db.json
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.groceries-api.entrypoints=web,websecure"
+      - "traefik.http.routers.groceries-api.rule=Host(`groceries.matmoa.xyz`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.groceries-api.tls=true"
+      - "traefik.http.routers.groceries-api.tls.certresolver=production"
+networks:
+  default:
+    external: true
+    name: proxy

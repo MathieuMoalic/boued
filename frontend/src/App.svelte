@@ -1,44 +1,32 @@
 <script>
   import { onMount } from "svelte";
+  import Spinner from "./Spinner.svelte";
+  import Input from "./Input.svelte";
+  import RemoveButton from "./RemoveButton.svelte";
 
-  let api = "https://groceriesapi.matmoa.xyz";
-  let newWord = "";
+  let api = "./api";
   let items = [];
-
-  let addItem = async () => {
-    if (newWord != "") {
-      let res = await fetch(api + "/" + newWord, { method: "post" });
-      items = await res.json();
-      newWord = "";
-    }
-  };
-
-  let removeItem = async (id) => {
-    let res = await fetch(api + "/" + id, { method: "delete" });
-    items = await res.json();
-  };
+  let itemsCache = localStorage["items"];
+  if (itemsCache) items = JSON.parse(itemsCache);
 
   onMount(async () => {
-    let res = await fetch(api);
-    items = await res.json();
+    items = await fetch(api).then((res) => res.json());
+    localStorage["items"] = JSON.stringify(items);
   });
 </script>
 
 <main>
-  <form type="submit" action="#" on:submit={addItem}>
-    <input bind:value={newWord} placeholder=" Add item" />
-  </form>
+  <Input bind:items {api} />
   <div>
-    {#each items.reverse() as item}
+    {#each items as { name, id }}
       <div class="item">
-        <button
-          type="submit"
-          on:click|preventDefault={() => {
-            removeItem(item.id);
-          }}>x</button
-        >
+        {#if id == -1}
+          <Spinner />
+        {:else}
+          <RemoveButton bind:items {id} {api} />
+        {/if}
         <div class="name">
-          {item.name}
+          {name}
         </div>
       </div>
     {/each}
@@ -54,40 +42,15 @@
     font-size: large;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 400;
-    padding-bottom: 100%;
-    background-image: url("/background.png");
+    padding-bottom: 90%;
+    background-image: url("/background.avif");
     background-attachment: fixed;
-  }
-  form {
-    display: flex;
-    padding: 15px;
-    border: 0px;
-  }
-  input {
-    flex-grow: 1;
-    background-color: rgb(131, 35, 0);
-    border: 0px;
-    border-radius: 5px;
-    padding: 5px;
-    padding-left: 15px;
-
-    font-size: larger;
-    color: aliceblue;
-    font-weight: 400;
-    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
   }
   div.item {
     display: flex;
     padding-top: 5px;
     padding-bottom: 5px;
     padding-left: 25px;
-  }
-  button {
-    font-size: large;
-    background: none;
-    border: 1px solid rgba(128, 128, 128, 0.432);
-    border-radius: 4px;
-    font-weight: 600;
   }
   div.name {
     padding-left: 10px;
