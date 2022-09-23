@@ -1,13 +1,13 @@
 <script>
     export let items;
-    export let loadingItems;
     export let item;
     export let api;
+    export let loadingItems;
 
-    let removeItem = async () => {
+    let addItem = async () => {
         loadingItems.push(item)
         loadingItems = loadingItems
-        items = await fetch(api + "/" + item, { method: "delete" }).then((r) =>
+        items = await fetch(api + "/" + item, { method: "post" }).then((r) =>
             r.json()
         );
         localStorage["items"] = JSON.stringify(items);
@@ -15,7 +15,7 @@
     };
 </script>
 
-<button on:click={() => removeItem()}>x</button>
+<button on:click={() => addItem()}>+</button>
 
 <style>
     button {

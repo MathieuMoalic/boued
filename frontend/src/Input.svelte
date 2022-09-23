@@ -1,18 +1,31 @@
 <script>
     export let items;
+    export let loadingItems;
     export let api;
 
     let addItem = async (input) => {
-        let word = input.value;
-        if (word != "") {
-            items = [{ name: word, id: -1 }, ...items];
+        let item = input.value;
+        if (item != "") {
+            item = item[0].toUpperCase() + item.slice(1).toLowerCase();
+            // if item already in active list
+            if (items['active'].includes(item)) {
+                // remove it from the list
+                items = {'active':items['active'].filter((x) => x != item), 'inactive':items['inactive']};
+                // if item already in inactive list
+            } else if (items['inactive'].includes(item)) {
+                items = {'active':items['active'],'inactive':items['inactive'].filter((x) => x != item) };
+            }
+            // add it at the beginning
+            items['active'].unshift(item)
+            items = {'active':items['active'], 'inactive':items['inactive']};
+            loadingItems.push(item);
+            loadingItems = loadingItems
             input.value = "";
-            items = await fetch(api + "/" + word, { method: "post" }).then(
+            items = await fetch(api + "/" + item, { method: "post" }).then(
                 (res) => res.json()
             );
-            // console.log("saving items in cache ...");
-            // localStorage["items"] = JSON.stringify(items);
-            // console.log("saved.");
+            localStorage["items"] = JSON.stringify(items);
+            loadingItems = loadingItems.filter((x) => x != item);
         }
     };
 </script>

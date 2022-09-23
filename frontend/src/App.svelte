@@ -3,9 +3,14 @@
   import Spinner from "./Spinner.svelte";
   import Input from "./Input.svelte";
   import RemoveButton from "./RemoveButton.svelte";
+  import AddButton from "./AddButton.svelte";
 
   let api = "./api";
-  let items = [];
+  let items = {
+    'active': [],
+    'inactive': [],
+  }
+  let loadingItems = [];
   let itemsCache = localStorage["items"];
   if (itemsCache) items = JSON.parse(itemsCache);
 
@@ -16,17 +21,32 @@
 </script>
 
 <main>
-  <Input bind:items {api} />
-  <div>
-    {#each items as { name, id }}
+  <Input bind:items bind:loadingItems {api} />
+  <div class="active">
+    {#each items.active as item}
       <div class="item">
-        {#if id == -1}
+        {#if loadingItems.includes(item)}
           <Spinner />
         {:else}
-          <RemoveButton bind:items {id} {api} />
+          <RemoveButton bind:items bind:loadingItems {item} {api} />
         {/if}
         <div class="name">
-          {name}
+          {item}
+        </div>
+      </div>
+    {/each}
+  </div>
+  <hr />
+  <div class="inactive">
+    {#each items.inactive as item}
+      <div class="item">
+        {#if loadingItems.includes(item)}
+          <Spinner />
+        {:else}
+          <AddButton bind:items bind:loadingItems {item} {api} />
+        {/if}
+        <div class="name">
+        <strike>{item}</strike>
         </div>
       </div>
     {/each}
@@ -46,6 +66,9 @@
     background-image: url("/background.avif");
     background-attachment: fixed;
   }
+  hr {
+    border: 1px gray solid;
+  }
   div.item {
     display: flex;
     padding-top: 5px;
@@ -54,5 +77,11 @@
   }
   div.name {
     padding-left: 10px;
+  }
+  div.active {
+    color: black;
+  }
+  div.inactive {
+    color: gray;
   }
 </style>
