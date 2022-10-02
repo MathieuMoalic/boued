@@ -5,13 +5,13 @@
     export let loadingItems;
 
     let addItem = async () => {
-        loadingItems.push(item)
+        loadingItems.push(item.name)
         loadingItems = loadingItems
-        items = await fetch(api + "/" + item, { method: "post" }).then((r) =>
+        items = await fetch(api + "/" + item.name, { method: "post" }).then((r) =>
             r.json()
         );
         localStorage["items"] = JSON.stringify(items);
-        loadingItems = loadingItems.filter(x => x != item)
+        loadingItems = loadingItems.filter(x => x != item.name)
     };
 </script>
 

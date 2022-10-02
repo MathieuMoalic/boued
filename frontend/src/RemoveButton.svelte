@@ -5,13 +5,13 @@
     export let api;
 
     let removeItem = async () => {
-        loadingItems.push(item)
+        loadingItems.push(item.name)
         loadingItems = loadingItems
-        items = await fetch(api + "/" + item, { method: "delete" }).then((r) =>
+        items = await fetch(api + "/" + item.name, { method: "delete" }).then((r) =>
             r.json()
         );
         localStorage["items"] = JSON.stringify(items);
-        loadingItems = loadingItems.filter(x => x != item)
+        loadingItems = loadingItems.filter(x => x != item.name)
     };
 </script>
 

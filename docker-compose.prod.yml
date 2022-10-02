@@ -13,7 +13,6 @@ services:
       - "traefik.http.routers.groceries.rule=Host(`groceries.matmoa.xyz`)"
       - "traefik.http.routers.groceries.tls=true"
       - "traefik.http.routers.groceries.tls.certresolver=production"
-      - "traefik.http.routers.groceries.middlewares=authelia@file"
   groceries-backend-prod:
     build:
       context: ./backend/
@@ -22,7 +21,7 @@ services:
     restart: unless-stopped
     container_name: groceries-backend-prod
     volumes:
-      - /home/mat/docker/groceries-app/backend/db_prod.json:/app/db.json
+      - ./backend/db_prod.json:/app/db.json
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.groceries-api.entrypoints=web,websecure"
@@ -31,5 +30,5 @@ services:
       - "traefik.http.routers.groceries-api.tls.certresolver=production"
 networks:
   default:
+    name: groceries-app
     external: true
-    name: proxy

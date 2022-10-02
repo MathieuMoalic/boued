@@ -6,10 +6,7 @@
   import AddButton from "./AddButton.svelte";
 
   let api = "./api";
-  let items = {
-    'active': [],
-    'inactive': [],
-  }
+  let items = [];
   let loadingItems = [];
   let itemsCache = localStorage["items"];
   if (itemsCache) items = JSON.parse(itemsCache);
@@ -23,32 +20,36 @@
 <main>
   <Input bind:items bind:loadingItems {api} />
   <div class="active">
-    {#each items.active as item}
-      <div class="item">
-        {#if loadingItems.includes(item)}
-          <Spinner />
-        {:else}
-          <RemoveButton bind:items bind:loadingItems {item} {api} />
-        {/if}
-        <div class="name">
-          {item}
+    {#each items as item}
+      {#if item.active}
+        <div class="item">
+          {#if loadingItems.includes(item.name)}
+            <Spinner />
+          {:else}
+            <RemoveButton bind:items bind:loadingItems {item} {api} />
+          {/if}
+          <div class="name">
+            {item.name}{item.emoji}
+          </div>
         </div>
-      </div>
+      {/if}
     {/each}
   </div>
   <hr />
   <div class="inactive">
-    {#each items.inactive as item}
-      <div class="item">
-        {#if loadingItems.includes(item)}
-          <Spinner />
-        {:else}
-          <AddButton bind:items bind:loadingItems {item} {api} />
-        {/if}
-        <div class="name">
-        <strike>{item}</strike>
+    {#each items as item}
+      {#if !item.active}
+        <div class="item">
+          {#if loadingItems.includes(item.name)}
+            <Spinner />
+          {:else}
+            <AddButton bind:items bind:loadingItems {item} {api} />
+          {/if}
+          <div class="name">
+            <strike>{item.name}</strike>
+          </div>
         </div>
-      </div>
+      {/if}
     {/each}
   </div>
 </main>

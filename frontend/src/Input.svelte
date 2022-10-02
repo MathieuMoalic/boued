@@ -4,28 +4,37 @@
     export let api;
 
     let addItem = async (input) => {
-        let item = input.value;
-        if (item != "") {
-            item = item[0].toUpperCase() + item.slice(1).toLowerCase();
-            // if item already in active list
-            if (items['active'].includes(item)) {
-                // remove it from the list
-                items = {'active':items['active'].filter((x) => x != item), 'inactive':items['inactive']};
-                // if item already in inactive list
-            } else if (items['inactive'].includes(item)) {
-                items = {'active':items['active'],'inactive':items['inactive'].filter((x) => x != item) };
+        let item_name = input.value;
+        if (item_name != "") {
+            item_name =
+                item_name[0].toUpperCase() + item_name.slice(1).toLowerCase();
+            let found = false;
+            // if the item was already added, put it as active and at the top of the list
+            items.forEach((item) => {
+                if (item.name == item_name) {
+                    items.unshift(item);
+                    items[0].active = true;
+                    found = true;
+                }
+            });
+            // if it's a new item, create it
+            if (!found) {
+                items.unshift({
+                    name: item_name,
+                    active: true,
+                    category: "",
+                    emoji: "",
+                });
             }
-            // add it at the beginning
-            items['active'].unshift(item)
-            items = {'active':items['active'], 'inactive':items['inactive']};
-            loadingItems.push(item);
-            loadingItems = loadingItems
+            items = items;
+            loadingItems.push(item_name);
+            loadingItems = loadingItems;
             input.value = "";
-            items = await fetch(api + "/" + item, { method: "post" }).then(
+            items = await fetch(api + "/" + item_name, { method: "post" }).then(
                 (res) => res.json()
             );
             localStorage["items"] = JSON.stringify(items);
-            loadingItems = loadingItems.filter((x) => x != item);
+            loadingItems = loadingItems.filter((x) => x != item_name);
         }
     };
 </script>

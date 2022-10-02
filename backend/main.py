@@ -3,13 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 import json
 
 app = FastAPI(title="Groceries API")
-db = [[],[]]
 
-with open("db.json", "w") as fp:
-    json.dump({
-        'active' : [],
-        'inactive' : [],
-        },fp)
+# with open("db.json", "w") as fp:
+#     json.dump([
+#         {'name':'Tomato', 'active':True, 'category':'vegetable', 'emoji':''},
+#         {'name':'Potato', 'active':False, 'category':'vegetable', 'emoji':''},
+#         ],fp)
 
 with open("db.json","r") as f:
     db = json.load(f)
@@ -21,6 +20,7 @@ app.add_middleware(
     allow_methods=["*"], 
     allow_headers=["*"],
 )
+
 def save():
     with open("db.json", "w") as fp:
         json.dump(db, fp)
@@ -29,27 +29,26 @@ def save():
 async def get_items():
     return db
 
-@app.delete("/api/{item}")
-async def delete_item(item: str):
-    item = item.capitalize()
-    if item in db['active']:
-        db['active'].remove(item)
-        db['inactive'].insert(0,item)
+@app.delete("/api/{item_name}")
+async def delete_item(item_name: str):
+    for item in db:
+        if item['name'] == item_name:
+            db.insert(0, db.pop(db.index(item)))
+            db[0]['active'] = False
     save()
     return db
 
-@app.post("/api/{item}")
-async def add_item(item: str):
-    item = item.capitalize()
+@app.post("/api/{item_name}")
+async def add_item(item_name: str):
+    item_name = item_name.capitalize()
     # if already in active, puts it at the top
-    if item in db['active']:
-        db['active'].remove(item)
-        db['active'].insert(0,item)
-    # else if in inactive, move it to active
-    elif item in db['inactive']:
-        db['inactive'].remove(item)
-        db['active'].insert(0,item)
-    else:
-        db['active'].insert(0,item)
+    found = False
+    for item in db:
+        if item['name'] == item_name:
+            db.insert(0, db.pop(db.index(item)))
+            db[0]['active'] = True
+            found = True
+    if not found :
+        db.insert(0,{'name':item_name,'active':True,'category':'','emoji':''})
     save()
     return db
