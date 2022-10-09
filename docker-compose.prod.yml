@@ -21,7 +21,7 @@ services:
     restart: unless-stopped
     container_name: groceries-backend-prod
     volumes:
-      - ./backend/db_prod.json:/app/db.json
+      - ./backend/db_prod.json:/app/db.json:Z
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.groceries-api.entrypoints=web,websecure"
