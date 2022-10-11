@@ -1,9 +1,9 @@
 version: "3.3"
 services:
   groceries-frontend-prod:
-    build:
-      context: ./frontend/
-      dockerfile: prod.Dockerfile
+    # build:
+      # context: ./frontend/
+      # dockerfile: prod.Dockerfile
     image: groceries-frontend-prod
     restart: unless-stopped
     container_name: groceries-frontend-prod
@@ -14,9 +14,9 @@ services:
       - "traefik.http.routers.groceries.tls=true"
       - "traefik.http.routers.groceries.tls.certresolver=production"
   groceries-backend-prod:
-    build:
-      context: ./backend/
-      dockerfile: prod.Dockerfile
+    # build:
+      # context: ./backend/
+      # dockerfile: prod.Dockerfile
     image: groceries-backend-prod
     restart: unless-stopped
     container_name: groceries-backend-prod
