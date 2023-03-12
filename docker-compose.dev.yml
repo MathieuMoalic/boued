@@ -10,12 +10,6 @@ services:
       - /home/mat/docker/groceries-app/frontend/src:/app/src
       - /home/mat/docker/groceries-app/frontend/public:/app/public
       - /home/mat/docker/groceries-app/frontend/rollup.config.js:/app/rollup.config.js
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.groceries-dev.entrypoints=web,websecure"
-      - "traefik.http.routers.groceries-dev.rule=Host(`dev.matmoa.xyz`)"
-      - "traefik.http.routers.groceries-dev.tls=true"
-      - "traefik.http.routers.groceries-dev.tls.certresolver=production"
   groceries-backend-dev:
     build:
       context: ./backend/
@@ -25,12 +19,6 @@ services:
     volumes:
       - /home/mat/docker/groceries-app/backend/db_dev.json:/app/db.json
       - /home/mat/docker/groceries-app/backend/main.py:/app/main.py
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.groceries-dev-api.entrypoints=web,websecure"
-      - "traefik.http.routers.groceries-dev-api.rule=Host(`dev.matmoa.xyz`) && PathPrefix(`/api`)"
-      - "traefik.http.routers.groceries-dev-api.tls=true"
-      - "traefik.http.routers.groceries-dev-api.tls.certresolver=production"
 networks:
   default:
     external: true
