@@ -2,6 +2,7 @@
     export let items;
     export let loadingItems;
     export let api;
+    export let category;
 
     let addItem = async (input) => {
         let item_name = input.value;
@@ -30,9 +31,9 @@
             loadingItems.push(item_name);
             loadingItems = loadingItems;
             input.value = "";
-            items = await fetch(api + "/" + item_name, { method: "post" }).then(
-                (res) => res.json()
-            );
+            items = await fetch(api + "/" + category + "/" + item_name, {
+                method: "post",
+            }).then((res) => res.json());
             localStorage["items"] = JSON.stringify(items);
             loadingItems = loadingItems.filter((x) => x != item_name);
         }

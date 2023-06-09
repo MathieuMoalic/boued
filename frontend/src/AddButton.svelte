@@ -1,17 +1,18 @@
 <script>
+    export let category;
     export let items;
     export let item;
     export let api;
     export let loadingItems;
 
     let addItem = async () => {
-        loadingItems.push(item.name)
-        loadingItems = loadingItems
-        items = await fetch(api + "/" + item.name, { method: "post" }).then((r) =>
-            r.json()
-        );
+        loadingItems.push(item.name);
+        loadingItems = loadingItems;
+        items = await fetch(api + "/" + category + "/" + item.name, {
+            method: "post",
+        }).then((r) => r.json());
         localStorage["items"] = JSON.stringify(items);
-        loadingItems = loadingItems.filter(x => x != item.name)
+        loadingItems = loadingItems.filter((x) => x != item.name);
     };
 </script>
 

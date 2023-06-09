@@ -4,12 +4,6 @@ import json
 
 app = FastAPI(title="Groceries API")
 
-# with open("db.json", "w") as fp:
-#     json.dump([
-#         {'name':'Tomato', 'active':True, 'category':'vegetable', 'emoji':''},
-#         {'name':'Potato', 'active':False, 'category':'vegetable', 'emoji':''},
-#         ],fp)
-
 with open("db.json","r") as f:
     db = json.load(f)
 
@@ -29,26 +23,26 @@ def save():
 async def get_items():
     return db
 
-@app.delete("/api/{item_name}")
-async def delete_item(item_name: str):
+@app.delete("/api/{category}/{item_name}")
+async def delete_item(category: str, item_name: str):
     for item in db:
-        if item['name'] == item_name:
+        if item['name'] == item_name and item['category'] == category:
             db.insert(0, db.pop(db.index(item)))
             db[0]['active'] = False
     save()
     return db
 
-@app.post("/api/{item_name}")
-async def add_item(item_name: str):
+@app.post("/api/{category}/{item_name}")
+async def add_item(category: str, item_name: str):
     item_name = item_name.capitalize()
     # if already in active, puts it at the top
     found = False
     for item in db:
-        if item['name'] == item_name:
+        if item['name'] == item_name and item['category'] == category:
             db.insert(0, db.pop(db.index(item)))
             db[0]['active'] = True
             found = True
     if not found :
-        db.insert(0,{'name':item_name,'active':True,'category':'','emoji':''})
+        db.insert(0,{'name':item_name,'active':True,'category':category,'emoji':''})
     save()
     return db

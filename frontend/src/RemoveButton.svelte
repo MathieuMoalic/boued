@@ -1,17 +1,18 @@
 <script>
+    export let category;
     export let items;
     export let loadingItems;
     export let item;
     export let api;
 
     let removeItem = async () => {
-        loadingItems.push(item.name)
-        loadingItems = loadingItems
-        items = await fetch(api + "/" + item.name, { method: "delete" }).then((r) =>
-            r.json()
-        );
+        loadingItems.push(item.name);
+        loadingItems = loadingItems;
+        items = await fetch(api + "/" + category + "/" + item.name, {
+            method: "delete",
+        }).then((r) => r.json());
         localStorage["items"] = JSON.stringify(items);
-        loadingItems = loadingItems.filter(x => x != item.name)
+        loadingItems = loadingItems.filter((x) => x != item.name);
     };
 </script>
 
@@ -24,5 +25,6 @@
         border: 1px solid rgba(128, 128, 128, 0.432);
         border-radius: 4px;
         font-weight: 600;
+        color: hsl(208, 34%, 70%);
     }
 </style>

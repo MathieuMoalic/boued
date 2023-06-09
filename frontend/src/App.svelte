@@ -4,8 +4,10 @@
   import Input from "./Input.svelte";
   import RemoveButton from "./RemoveButton.svelte";
   import AddButton from "./AddButton.svelte";
+  import Tab from "./Tab.svelte";
 
   let api = "./api";
+  let category = "Groceries";
   let items = [];
   let loadingItems = [];
   let itemsCache = localStorage["items"];
@@ -18,15 +20,22 @@
 </script>
 
 <main>
-  <Input bind:items bind:loadingItems {api} />
+  <Tab bind:category />
+  <Input bind:category bind:items bind:loadingItems {api} />
   <div class="active">
     {#each items as item}
-      {#if item.active}
+      {#if item.active && item.category == category}
         <div class="item">
           {#if loadingItems.includes(item.name)}
             <Spinner />
           {:else}
-            <RemoveButton bind:items bind:loadingItems {item} {api} />
+            <RemoveButton
+              bind:category
+              bind:items
+              bind:loadingItems
+              {item}
+              {api}
+            />
           {/if}
           <div class="name">
             {item.name}{item.emoji}
@@ -38,12 +47,18 @@
   <hr />
   <div class="inactive">
     {#each items as item}
-      {#if !item.active}
+      {#if !item.active && item.category == category}
         <div class="item">
           {#if loadingItems.includes(item.name)}
             <Spinner />
           {:else}
-            <AddButton bind:items bind:loadingItems {item} {api} />
+            <AddButton
+              bind:category
+              bind:items
+              bind:loadingItems
+              {item}
+              {api}
+            />
           {/if}
           <div class="name">
             <strike>{item.name}</strike>
@@ -59,7 +74,7 @@
     margin: 0px;
     border: 0px;
     padding: 0px;
-    color: aliceblue;
+    color: hsl(208, 49%, 82%);
     font-size: large;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
     font-weight: 400;
@@ -78,9 +93,6 @@
   }
   div.name {
     padding-left: 10px;
-  }
-  div.active {
-    color: black;
   }
   div.inactive {
     color: gray;

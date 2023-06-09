@@ -14,6 +14,7 @@ const FILES_TO_CACHE = [
   "/service-worker.js",
   "/",
 ];
+
 // install
 self.addEventListener("install", (evt) => {
   // console.log("[ServiceWorker] Install");
@@ -54,6 +55,12 @@ self.addEventListener("fetch", (e) => {
         const response = await fetch(e.request);
         const cache = await caches.open(CACHE_NAME);
         // console.log(`[Service Worker] Caching new resource: ${e.request.url}`);
+
+        // check if request is made by chrome extensions or web page
+        // if request is made for web page url must contains http.
+        // if (!(e.request.url.indexOf('http') === 0)) return; // skip the request. if request is not made with http protocol
+
+
         cache.put(e.request, response.clone());
         return response;
       })()

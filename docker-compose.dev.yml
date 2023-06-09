@@ -6,20 +6,20 @@ services:
       dockerfile: dev.Dockerfile
     image: groceries-frontend-dev
     container_name: groceries-frontend-dev
+    ports:
+      - 6000:6000
     volumes:
-      - /home/mat/docker/groceries-app/frontend/src:/app/src
-      - /home/mat/docker/groceries-app/frontend/public:/app/public
-      - /home/mat/docker/groceries-app/frontend/rollup.config.js:/app/rollup.config.js
+      - ./frontend/src:/app/src:z
+      - ./frontend/public:/app/public:z
+      - ./frontend/rollup.config.js:/app/rollup.config.js:z
   groceries-backend-dev:
     build:
       context: ./backend/
       dockerfile: dev.Dockerfile
     image: groceries-backend-dev
     container_name: groceries-backend-dev
+    ports:
+      - 6001:6001
     volumes:
-      - /home/mat/docker/groceries-app/backend/db_dev.json:/app/db.json
-      - /home/mat/docker/groceries-app/backend/main.py:/app/main.py
-networks:
-  default:
-    external: true
-    name: proxy
+      - ./backend/db_dev.json:/app/db.json:z
+      - ./backend/main.py:/app/main.py:z
