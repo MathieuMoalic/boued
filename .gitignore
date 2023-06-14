@@ -3,6 +3,8 @@ __pycache__
 node_modules/
 /frontend/public/build/
 .vscode
-backend/db
-backend/db_dev.json
-backend/db_prod.json
+frontend/dev-dist
+meili_data
+Q.ipynb
+db*.json
+backend/static

@@ -1,8 +1,8 @@
-<script>
-    export let category;
-    let changeTab = async (tab) => {
-        if (tab != category) {
-            category = tab;
+<script lang="ts">
+    import { category } from "./../store";
+    let changeTab = async (tab: string) => {
+        if (tab != $category) {
+            $category = tab;
             if (tab == "Alcohol") {
                 document.getElementById("Groceries").classList.remove("active");
                 document.getElementById("Groceries").classList.add("inactive");

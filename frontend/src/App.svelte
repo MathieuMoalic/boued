@@ -1,70 +1,35 @@
-<script>
+<script lang="ts">
   import { onMount } from "svelte";
-  import Spinner from "./Spinner.svelte";
-  import Input from "./Input.svelte";
-  import RemoveButton from "./RemoveButton.svelte";
-  import AddButton from "./AddButton.svelte";
-  import Tab from "./Tab.svelte";
+  import Spinner from "./lib/Spinner.svelte";
+  import Input from "./lib/Input.svelte";
+  import RemoveButton from "./lib/RemoveButton.svelte";
+  import Tab from "./lib/Tab.svelte";
+  import { items, category, api, loadingItems } from "./store";
 
-  let api = "./api";
-  let category = "Groceries";
-  let items = [];
-  let loadingItems = [];
   let itemsCache = localStorage["items"];
-  if (itemsCache) items = JSON.parse(itemsCache);
+  if (itemsCache) $items = JSON.parse(itemsCache);
 
   onMount(async () => {
-    items = await fetch(api).then((res) => res.json());
-    localStorage["items"] = JSON.stringify(items);
+    $items = await fetch($api).then((res) => res.json());
+    localStorage["items"] = JSON.stringify($items);
   });
 </script>
 
 <main>
-  <Tab bind:category />
-  <Input bind:category bind:items bind:loadingItems {api} />
+  <Tab />
+  <Input />
   <div class="active">
-    {#each items as item}
-      {#if item.active && item.category == category}
-        <div class="item">
-          {#if loadingItems.includes(item.name)}
-            <Spinner />
-          {:else}
-            <RemoveButton
-              bind:category
-              bind:items
-              bind:loadingItems
-              {item}
-              {api}
-            />
-          {/if}
-          <div class="name">
-            {item.name}{item.emoji}
-          </div>
+    {#each $items[$category] as item}
+      <div class="item">
+        {#if $loadingItems.includes(item.name)}
+          <Spinner />
+        {:else}
+          <RemoveButton {item} />
+        {/if}
+        <div class="name">
+          {item}
         </div>
-      {/if}
-    {/each}
-  </div>
-  <hr />
-  <div class="inactive">
-    {#each items as item}
-      {#if !item.active && item.category == category}
-        <div class="item">
-          {#if loadingItems.includes(item.name)}
-            <Spinner />
-          {:else}
-            <AddButton
-              bind:category
-              bind:items
-              bind:loadingItems
-              {item}
-              {api}
-            />
-          {/if}
-          <div class="name">
-            <strike>{item.name}</strike>
-          </div>
-        </div>
-      {/if}
+      </div>
     {/each}
   </div>
 </main>
@@ -82,9 +47,6 @@
     background-image: url("/background.avif");
     background-attachment: fixed;
   }
-  hr {
-    border: 1px gray solid;
-  }
   div.item {
     display: flex;
     padding-top: 5px;
@@ -93,8 +55,5 @@
   }
   div.name {
     padding-left: 10px;
-  }
-  div.inactive {
-    color: gray;
   }
 </style>
