@@ -1,6 +1,6 @@
 services:
   groceries:
-    image: localhost/matmoa/groceries:v3
+    image: ghcr.io/mathieumoalic/groceries-app:3.1.1
     container_name: groceries
     environment:
       - MEILI_URL=${MEILI_URL}
@@ -11,7 +11,7 @@ services:
       - ./data:/data:z
 
   groceries-meilisearch:
-    image: getmeili/meilisearch:v1.2.0
+    image: docker.io/getmeili/meilisearch:v1.2.0
     container_name: groceries-meilisearch
     environment:
       - MEILI_MASTER_KEY=${MEILI_KEY}

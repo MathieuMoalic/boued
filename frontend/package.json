@@ -10,12 +10,10 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "@meilisearch/instant-meilisearch": "^0.13.2",
     "@sveltejs/vite-plugin-svelte": "^2.0.4",
     "@tsconfig/svelte": "^4.0.1",
     "algoliasearch": "^4.17.2",
     "instantsearch.js": "^4.1",
-    "meilisearch": "^0.33.0",
     "svelte": "^3.58.0",
     "svelte-check": "^3.3.1",
     "tslib": "^2.5.0",

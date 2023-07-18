@@ -8,3 +8,4 @@ meili_data
 Q.ipynb
 db*.json
 backend/static
+.dev

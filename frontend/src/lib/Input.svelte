@@ -1,12 +1,5 @@
 <script lang="ts">
-    import {
-        items,
-        category,
-        loadingItems,
-        api,
-        meili_client,
-        matches,
-    } from "../store";
+    import { items, category, loadingItems, api, matches } from "../store";
     import RemoveMeiliButton from "./RemoveMeiliButton.svelte";
 
     let input_field: string = "";
@@ -14,6 +7,10 @@
     let onKeyDown = async (event: KeyboardEvent) => {
         if (event.key == "Enter" && input_field != "") {
             addItem(input_field);
+        }
+        if (event.key == "Escape") {
+            $matches = [];
+            input_field = "";
         }
     };
     let onInput = async () => {
@@ -24,15 +21,9 @@
         }
     };
     let search = async () => {
-        const search = await $meili_client
-            .index($category)
-            .search(input_field, {
-                limit: 8,
-            });
-        $matches = [];
-        search.hits.forEach((element) => {
-            $matches.push(element.name);
-        });
+        $matches = await fetch(
+            $api + "/search/" + $category + "/" + input_field
+        ).then((res) => res.json());
     };
     let addItem = async (item_to_add: string) => {
         item_to_add = encodeURIComponent(item_to_add);
