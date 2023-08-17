@@ -101,3 +101,4 @@ tag-release:
     git commit -m "v$(jq -r .version frontend/package.json)"
     git tag "v$(jq -r .version frontend/package.json)"
     git push
+    git push --tags
