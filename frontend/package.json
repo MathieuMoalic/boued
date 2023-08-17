@@ -1,7 +1,7 @@
 {
-  "name": "vite-project",
+  "name": "groceries",
   "private": true,
-  "version": "0.0.0",
+  "version": "4.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite --host=0.0.0.0 --port=6000",
@@ -10,15 +10,13 @@
     "check": "svelte-check --tsconfig ./tsconfig.json"
   },
   "devDependencies": {
-    "@sveltejs/vite-plugin-svelte": "^2.0.4",
+    "@sveltejs/vite-plugin-svelte": "^2.4.5",
     "@tsconfig/svelte": "^4.0.1",
-    "algoliasearch": "^4.17.2",
-    "instantsearch.js": "^4.1",
-    "svelte": "^3.58.0",
-    "svelte-check": "^3.3.1",
-    "tslib": "^2.5.0",
-    "typescript": "^5.0.2",
-    "vite": "^4.3.9",
-    "vite-plugin-pwa": "^0.16.3"
+    "svelte": "^3.59.2",
+    "svelte-check": "^3.5.0",
+    "tslib": "^2.6.1",
+    "typescript": "^5.1.6",
+    "vite": "^4.4.9",
+    "vite-plugin-pwa": "^0.16.4"
   }
 }

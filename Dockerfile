@@ -7,7 +7,7 @@ COPY frontend .
 RUN npm run build
 RUN npm prune --production
 
-FROM python:3.11
+FROM python:3.11.3-slim-buster
 WORKDIR /app
 COPY --from=frontend /app/dist ./static
 COPY backend/requirements.txt ./
