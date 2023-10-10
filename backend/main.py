@@ -68,9 +68,11 @@ def init_db():
     DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(DB_PATH, "w") as fp:
         json.dump(db, fp)
+    print("Database created.")
 
 
 if not os.path.exists(DB_PATH):
+    print("Database not found, creating an empty one.")
     init_db()
 
 
