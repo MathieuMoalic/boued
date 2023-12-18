@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { items, category, loadingItems, api, matches } from "../store";
     import RemoveMeiliButton from "./RemoveMeiliButton.svelte";
 
@@ -21,12 +22,16 @@
         }
     };
     let search = async () => {
-        $matches = await fetch(
-            $api + "/search/" + $category + "/" + input_field
-        ).then((res) => res.json());
+        let path =
+            $api +
+            "/search/" +
+            $category +
+            "/" +
+            encodeURIComponent(encodeURIComponent(input_field));
+        $matches = await fetch(path).then((res) => res.json());
     };
     let addItem = async (item_to_add: string) => {
-        item_to_add = encodeURIComponent(item_to_add);
+        item_to_add = encodeURIComponent(encodeURIComponent(item_to_add));
         input_field = "";
         $matches = [];
         item_to_add =
@@ -51,6 +56,10 @@
         localStorage["items"] = JSON.stringify($items);
         $loadingItems = $loadingItems.filter((x) => x != item_to_add);
     };
+    let inputElement: HTMLInputElement;
+    onMount(() => {
+        inputElement.focus();
+    });
 </script>
 
 <div class="container">
@@ -59,6 +68,7 @@
             placeholder="Add item"
             on:keydown={(event) => onKeyDown(event)}
             bind:value={input_field}
+            bind:this={inputElement}
             on:input={() => onInput()}
         />
     </div>
