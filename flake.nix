@@ -17,10 +17,8 @@
         devEnv = pkgs.mkShell {
           buildInputs = with pkgs; [
             fix-python.packages.${system}.default
-            python311
-            ruff
-            ruff-lsp
-            ffmpeg
+            python312
+            nodejs_23
           ];
 
           shellHook = ''
