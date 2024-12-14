@@ -12,3 +12,4 @@ backend/static
 .direnv
 .venv
 *.egg-info
+*.db
