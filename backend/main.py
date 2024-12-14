@@ -1,30 +1,17 @@
-import json
 import hashlib
+import json
 import os
 import time
-from urllib.parse import unquote
-from typing import TypedDict, Literal
 from pathlib import Path
+from typing import Literal, TypedDict
+from urllib.parse import unquote
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-import meilisearch
-
-
-if "MEILI_URL" in os.environ:
-    MEILI_URL = os.environ["MEILI_URL"]
-else:
-    raise EnvironmentError("You have to define the env var `MEILI_URL`")
+from rapidfuzz import fuzz, process
 
 DEV = "DEV" in os.environ
-if DEV:
-    MEILI_KEY = None
-else:
-    if "MEILI_KEY" in os.environ:
-        MEILI_KEY = os.environ["MEILI_KEY"]
-    else:
-        raise EnvironmentError("You have to define the env var `MEILI_KEY`")
 
 DB_PATH = Path("/data/db.json")
 
@@ -55,26 +42,22 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-time.sleep(5)  # give meilisearch the time to initialize or it will timeout
-meili = meilisearch.Client(MEILI_URL, MEILI_KEY)
+
+time.sleep(2)  # Reduced sleep time as no external service to wait for
+
+DB_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 
 def init_db():
-    for index in meili.get_indexes()["results"]:
-        index.delete()
-    meili.create_index("Groceries", {"primaryKey": "id"})
-    meili.create_index("Alcohol", {"primaryKey": "id"})
     db = {"active": {"Groceries": [], "Alcohol": []}, "Groceries": [], "Alcohol": []}
-    DB_PATH.parent.mkdir(parents=True, exist_ok=True)
     with open(DB_PATH, "w") as fp:
         json.dump(db, fp)
     print("Database created.")
 
 
-if not os.path.exists(DB_PATH):
+if not DB_PATH.exists():
     print("Database not found, creating an empty one.")
     init_db()
-
 
 with open(DB_PATH, "r") as f:
     db: Db = json.load(f)
@@ -101,28 +84,19 @@ async def get_key():
 
 @app.delete("/api/{category}/{item_name}")
 async def delete_item(category: Category, item_name: str):
-    item_name = unquote(item_name)
+    item_name = unquote(item_name).capitalize()
     if item_name in db["active"][category]:
         db["active"][category].remove(item_name)
-    save()
-    return db["active"]
-
-
-@app.delete("/api/meili/{category}/{item_name}")
-async def delete_meili_item(category: Category, item_name: str):
-    item_name = unquote(item_name)
-    for item in db[category]:
-        if item["name"] == item_name:
-            db[category].remove(item)
-            break
-    meili.index(category).delete_document(get_id_from_name(item_name))
-    return await delete_item(category, item_name)
+        db[category] = [item for item in db[category] if item["name"] != item_name]
+        save()
+        return db["active"]
+    else:
+        raise HTTPException(status_code=404, detail="Item not found in active list.")
 
 
 @app.post("/api/{category}/{item_name}")
 async def add_item(category: Category, item_name: str):
-    item_name = unquote(item_name)
-    item_name = item_name.capitalize()
+    item_name = unquote(item_name).capitalize()
     if item_name in db["active"][category]:
         db["active"][category].remove(item_name)
     db["active"][category].insert(0, item_name)
@@ -134,24 +108,21 @@ async def add_item(category: Category, item_name: str):
             "name": item_name,
         },
     )
-    meili.index(category).update_documents(
-        [
-            {
-                "id": get_id_from_name(item_name),
-                "name": item_name,
-            }
-        ]
-    )
     save()
     return db["active"]
 
 
 @app.get("/api/search/{category}/{search_input}")
 async def get_search(category: Category, search_input: str):
-    res = meili.index(category).search(search_input, {"limit": 8})["hits"]
-    return [hit["name"] for hit in res]
+    # Extract the list of item names from the category
+    items = [item["name"] for item in db[category]]
+    # Use RapidFuzz to find the best matches
+    matches = process.extract(search_input, items, scorer=fuzz.WRatio, limit=8)
+    # Filter out matches with low similarity scores (optional)
+    filtered_matches = [match[0] for match in matches if match[1] >= 60]
+    return filtered_matches
 
 
 if not DEV:
-    # in prod, FastAPI will server the compiled svelte bundle
+    # In production, FastAPI will serve the compiled Svelte bundle
     app.mount("/", StaticFiles(directory="static", html=True), name="static")
