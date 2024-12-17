@@ -1,5 +1,5 @@
 <script>
-    import { items, category, api, loadingItems } from "../store";
+    import { items, category, api, loadingItems } from "./store";
     export let item;
     let removeItem = async () => {
         item = encodeURIComponent(item);
@@ -8,7 +8,7 @@
             $api + "/" + $category + "/" + encodeURIComponent(item),
             {
                 method: "delete",
-            }
+            },
         ).then((r) => r.json());
         localStorage["items"] = JSON.stringify($items);
         $loadingItems = $loadingItems.filter((x) => x != item);

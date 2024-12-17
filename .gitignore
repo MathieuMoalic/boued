@@ -13,3 +13,5 @@ backend/static
 .venv
 *.egg-info
 *.db
+frontend_old
+.svelte-kit

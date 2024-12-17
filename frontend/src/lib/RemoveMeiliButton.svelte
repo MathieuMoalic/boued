@@ -1,5 +1,5 @@
 <script>
-    import { category, api, loadingItems, items, matches } from "../store";
+    import { category, api, loadingItems, items, matches } from "./store";
     export let match;
 
     let removeItem = async () => {
@@ -9,7 +9,7 @@
             $api + "/meili/" + $category + "/" + encodeURIComponent(match),
             {
                 method: "delete",
-            }
+            },
         ).then((r) => r.json());
         $matches.splice($matches.indexOf(match), 1);
         $matches = $matches;
