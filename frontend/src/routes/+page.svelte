@@ -1,37 +1,36 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
-	// import Spinner from '../lib/Spinner.svelte';
-	import Input from '../lib/Input.svelte';
-	// import RemoveButton from './lib/RemoveButton.svelte';
-	// import Tab from './lib/Tab.svelte';
-	// import { items, category, api, loadingItems } from './store';
+	import { ws } from "$lib/store";
+	import type { Item } from "$lib/types";
+	import { onMount } from "svelte";
+	import SomeItems from "$lib/SomeItems.svelte";
+	import ItemComp from "$lib/Item.svelte";
 
-	// let itemsCache = localStorage['items'];
-	// if (itemsCache) $items = JSON.parse(itemsCache);
-
-	// onMount(async () => {
-	// 	$items = await fetch($api).then((res) => res.json());
-	// 	localStorage['items'] = JSON.stringify($items);
-	// });
+	let items: Item[] = [];
+	let loading = true;
+	onMount(() => {
+		$ws.readAllItems()
+			.then((result: Item[]) => {
+				items = result;
+			})
+			.catch((error: any) => {
+				console.error("Failed to fetch items:", error);
+			})
+			.finally(() => {
+				loading = false;
+			});
+	});
 </script>
 
 <main>
-	<!-- <Tab /> -->
-	<Input />
-	<!-- <div class="active">
-		{#each $items[$category] as item}
-			<div class="item">
-				{#if $loadingItems.includes(item.name)}
-					<Spinner />
-				{:else}
-					<RemoveButton {item} />
-				{/if}
-				<div class="name">
-					{item}
-				</div>
-			</div>
+	{#if loading}
+		<div>Loading...</div>
+	{:else if items.length === 0}
+		<div>No items found.</div>
+	{:else}
+		{#each items as item}
+			<ItemComp {item} />
 		{/each}
-	</div> -->
+	{/if}
 </main>
 
 <style>
@@ -41,10 +40,10 @@
 		padding: 0px;
 		color: hsl(208, 49%, 82%);
 		font-size: large;
-		font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 		font-weight: 400;
 		padding-bottom: 90%;
-		background-image: url('/background.avif');
+		background-image: url("/background.avif");
 		background-attachment: fixed;
 	}
 	/* div.item {

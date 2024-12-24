@@ -1,4 +1,5 @@
 import WebSocketClient from "./websocket";
+import { type Item } from "./types";
 
 class WebSocketCRUD {
     private wsClient: WebSocketClient;
@@ -13,7 +14,7 @@ class WebSocketCRUD {
      * @param item The item to create.
      * @returns A promise that resolves with the server's response.
      */
-    async createItem(item: { name: string; category: string; is_active: boolean }): Promise<any> {
+    async createItem(item: Item): Promise<any> {
         return this.sendAction("create", item);
     }
 
@@ -21,7 +22,7 @@ class WebSocketCRUD {
      * Read all items.
      * @returns A promise that resolves with the list of items.
      */
-    async readAllItems(): Promise<any> {
+    async readAllItems(): Promise<Item[]> {
         return this.sendAction("read_all");
     }
 
@@ -30,7 +31,7 @@ class WebSocketCRUD {
      * @param id The ID of the item to read.
      * @returns A promise that resolves with the item.
      */
-    async readItem(id: number): Promise<any> {
+    async readItem(id: number): Promise<Item> {
         return this.sendAction("read_one", { id });
     }
 
@@ -40,7 +41,7 @@ class WebSocketCRUD {
      * @param data The data to update the item with.
      * @returns A promise that resolves with the updated item.
      */
-    async updateItem(id: number, data: any): Promise<any> {
+    async updateItem(id: number, data: Partial<Item>): Promise<Item> {
         return this.sendAction("update", { id, data });
     }
 
@@ -49,7 +50,7 @@ class WebSocketCRUD {
      * @param id The ID of the item to delete.
      * @returns A promise that resolves with the deleted item.
      */
-    async deleteItem(id: number): Promise<any> {
+    async deleteItem(id: number): Promise<Item> {
         return this.sendAction("delete", { id });
     }
 
@@ -59,7 +60,7 @@ class WebSocketCRUD {
      * @param limit The maximum number of results to return.
      * @returns A promise that resolves with the search results.
      */
-    async searchItems(query: string, limit: number = 10): Promise<any> {
+    async searchItems(query: string, limit: number = 10): Promise<Item[]> {
         return this.sendAction("search", { query, limit });
     }
 
@@ -75,11 +76,12 @@ class WebSocketCRUD {
 
             // Handle WebSocket responses
             const handleResponse = (data: any) => {
-                if (data.action === action) {
-                    resolve(data);
-                    this.wsClient.onMessage(() => { }); // Clear handler
+                if (data.status === "success") {
+                    resolve(data.data); // or resolve the entire data object, if desired
+                    this.wsClient.onMessage(() => { }); // clear the handler
                 }
             };
+            4
 
             this.wsClient.onMessage(handleResponse);
 

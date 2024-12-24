@@ -12,9 +12,6 @@ class WebSocketClient {
         this.url = url;
     }
 
-    /**
-     * Connects to the WebSocket server.
-     */
     connect(): void {
         if (this.socket) {
             console.warn("WebSocket is already connected.");
@@ -46,9 +43,6 @@ class WebSocketClient {
         });
     }
 
-    /**
-     * Disconnects from the WebSocket server.
-     */
     disconnect(): void {
         if (!this.socket) {
             console.warn("WebSocket is not connected.");
@@ -59,15 +53,49 @@ class WebSocketClient {
 
     /**
      * Sends a message to the WebSocket server.
+     * Waits for the WebSocket to be ready before sending.
      * @param message The message object to send.
      */
     send(message: any): void {
-        if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-            console.error("WebSocket is not connected or not ready.");
-            return;
+        this.waitForOpenConnection()
+            .then(() => {
+                this.socket?.send(JSON.stringify(message));
+                console.log("WebSocket message sent:", message);
+            })
+            .catch((error) => {
+                console.error("Failed to send message:", error);
+            });
+    }
+
+    /**
+     * Waits for the WebSocket connection to be open.
+     * Resolves immediately if the connection is already open.
+     * @returns A promise that resolves when the WebSocket is open.
+     */
+    private waitForOpenConnection(): Promise<void> {
+        if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+            return Promise.resolve();
         }
-        this.socket.send(JSON.stringify(message));
-        console.log("WebSocket message sent:", message);
+
+        return new Promise((resolve, reject) => {
+            const maxRetries = 10;
+            const interval = 200; // 200ms
+
+            let retries = 0;
+
+            const checkConnection = () => {
+                if (this.socket && this.socket.readyState === WebSocket.OPEN) {
+                    resolve();
+                } else if (retries >= maxRetries) {
+                    reject(new Error("WebSocket connection timed out."));
+                } else {
+                    retries++;
+                    setTimeout(checkConnection, interval);
+                }
+            };
+
+            checkConnection();
+        });
     }
 
     /**
@@ -78,7 +106,7 @@ class WebSocketClient {
         this.onMessageHandler = handler;
     }
 
-    /**
+    /**`
      * Sets the handler for errors.
      * @param handler The function to handle errors.
      */

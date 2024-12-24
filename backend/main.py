@@ -1,11 +1,21 @@
 import json
+from typing import Optional
 
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
 from rapidfuzz import process
-from sqlmodel import Session, SQLModel, create_engine, select
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
-from backend.models import Item
+
+class Item(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    name: str = Field(index=True, unique=True)
+    category: str = Field(index=True)
+    is_active: bool = Field(default=False, index=True)
+    notes: Optional[str] = Field(default=None)
+    quantity: Optional[int] = Field(default=None)
+    unit: Optional[str] = Field(default=None)
+
 
 # Database setup
 database_url = "sqlite:///./test.db"
@@ -20,7 +30,6 @@ def get_session():
         yield session
 
 
-# WebSocket handler
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -64,7 +73,6 @@ async def websocket_endpoint(websocket: WebSocket):
             await websocket.send_json({"status": "error", "message": str(e)})
 
 
-# Functions for database operations
 def create_item(data: dict):
     with Session(engine) as session:
         item = Item(**data)
@@ -122,4 +130,4 @@ def search_items(query: str, limit: int = 10):
         return [item_names[match[0]].model_dump() for match in matches]
 
 
-app.mount("/", StaticFiles(directory="./public"), name="frontend")
+app.mount("/", StaticFiles(directory="./static", html=True), name="static")
