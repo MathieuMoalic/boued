@@ -1,8 +1,9 @@
 import json
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import FastAPI, WebSocket
 from fastapi.staticfiles import StaticFiles
+from pydantic import BaseModel, ValidationError, model_validator
 from rapidfuzz import process
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
@@ -35,12 +36,10 @@ async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
     async for message in websocket.iter_text():
         try:
-            # Parse message (assumes JSON format)
-            data = json.loads(message)  # Parse JSON from text
+            data = json.loads(message)
             action = data.get("action")
             payload = data.get("payload")
 
-            # Perform actions based on the "action" type
             if action == "create":
                 result = create_item(payload)
                 await websocket.send_json({"status": "success", "data": result})
@@ -64,6 +63,10 @@ async def websocket_endpoint(websocket: WebSocket):
                 query = payload.get("query")
                 limit = payload.get("limit", 10)
                 result = search_items(query, limit)
+                await websocket.send_json({"status": "success", "data": result})
+            elif action == "read_filtered":
+                filters = payload.get("filters", {})
+                result = read_filtered_items(filters)
                 await websocket.send_json({"status": "success", "data": result})
             else:
                 await websocket.send_json(
@@ -128,6 +131,46 @@ def search_items(query: str, limit: int = 10):
         item_names = {item.name: item for item in items}
         matches = process.extract(query, item_names.keys(), limit=limit)
         return [item_names[match[0]].model_dump() for match in matches]
+
+
+class ItemFilter(BaseModel):
+    is_active: Optional[bool] = None
+    category: Optional[str] = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def check_unknown_fields(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """
+        Ensure no unknown fields are passed. If any extra fields exist,
+        raise a ValueError.
+        """
+        valid_fields = {"is_active", "category"}
+        for field in values.keys():
+            if field not in valid_fields:
+                raise ValueError(f"Unknown filter '{field}' passed.")
+        return values
+
+
+def read_filtered_items(raw_filters: dict[str, Any]) -> list[dict[str, Any]]:
+    """
+    Validate raw_filters using the ItemFilter pydantic model (Pydantic v2).
+    Build a query based on the validated filters.
+    """
+    try:
+        # Validate filters using the ItemFilter model validator
+        filters = ItemFilter(**raw_filters)
+    except ValidationError as e:
+        raise ValueError(f"Invalid filters: {str(e)}")
+
+    with Session(engine) as session:
+        query = select(Item)
+        if filters.is_active is not None:
+            query = query.where(Item.is_active == filters.is_active)
+        if filters.category is not None:
+            query = query.where(Item.category == filters.category)
+
+        items = session.exec(query).all()
+        return [item.model_dump() for item in items]
 
 
 app.mount("/", StaticFiles(directory="./static", html=True), name="static")

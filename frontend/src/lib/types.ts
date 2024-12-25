@@ -7,3 +7,8 @@ export interface Item {
     quantity?: number;
     unit?: string;
 }
+
+export interface ItemFilter {
+    category?: string;
+    is_active?: boolean;
+}

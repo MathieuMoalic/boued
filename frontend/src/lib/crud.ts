@@ -1,5 +1,5 @@
 import WebSocketClient from "./websocket";
-import { type Item } from "./types";
+import { type Item, type ItemFilter } from "./types";
 
 class WebSocketCRUD {
     private wsClient: WebSocketClient;
@@ -24,6 +24,15 @@ class WebSocketCRUD {
      */
     async readAllItems(): Promise<Item[]> {
         return this.sendAction("read_all");
+    }
+
+    /**
+     * Read items that match a filter.
+     * @param filters The filter to apply.
+     * @returns A promise that resolves with the list of items.
+     */
+    async readFilteredItems(filters: ItemFilter): Promise<Item[]> {
+        return this.sendAction("read_filtered", { filters });
     }
 
     /**

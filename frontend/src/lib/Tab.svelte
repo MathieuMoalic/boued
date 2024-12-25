@@ -1,22 +1,18 @@
 <script lang="ts">
-	import { writable } from 'svelte/store';
-
-	// Store for the current active tab
-	export const category = writable('Groceries');
-
-	// List of tabs (can be extended dynamically)
-	let tabs = ['Groceries', 'Alcohol', 'Snacks', 'Beverages'];
-
-	// Function to change the active tab
-	let changeTab = (tab: string) => {
-		category.set(tab);
+	import { tab } from "$lib/store";
+	let tabs = ["Active", "Inactive"];
+	let changeTab = (new_tab: string) => {
+		tab.set(new_tab);
 	};
 </script>
 
 <div>
-	{#each tabs as tab}
-		<button class={$category === tab ? 'active' : 'inactive'} on:click={() => changeTab(tab)}>
-			{tab}
+	{#each tabs as new_tab}
+		<button
+			class={$tab === new_tab ? "active" : "inactive"}
+			on:click={() => changeTab(new_tab)}
+		>
+			{new_tab}
 		</button>
 	{/each}
 </div>

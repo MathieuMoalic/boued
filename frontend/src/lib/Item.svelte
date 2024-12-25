@@ -2,15 +2,38 @@
     import type { Item } from "$lib/types";
     import { ws } from "$lib/store";
     export let item: Item;
+    export let onUpdate: (item: Item) => void; // Callback passed from parent
 
     function deactivateItem() {
         if (item.id === undefined) {
             console.error("Item ID is undefined.");
             return;
         }
-        $ws.updateItem(item.id, { is_active: false }).catch((error: any) => {
-            console.error(`Failed to deactivate item '${item.name}':`, error);
-        });
+        $ws.updateItem(item.id, { is_active: false })
+            .catch((error: any) => {
+                console.error(
+                    `Failed to deactivate item '${item.name}':`,
+                    error,
+                );
+            })
+            .then(() => {
+                item.is_active = false;
+                onUpdate(item); // Notify parent
+            });
+    }
+    function activateItem() {
+        if (item.id === undefined) {
+            console.error("Item ID is undefined.");
+            return;
+        }
+        $ws.updateItem(item.id, { is_active: true })
+            .catch((error: any) => {
+                console.error(`Failed to activate item '${item.name}':`, error);
+            })
+            .then(() => {
+                item.is_active = true;
+                onUpdate(item); // Notify parent
+            });
     }
 
     function showInfo() {
@@ -19,9 +42,12 @@
 </script>
 
 <div class="item-row">
-    <button class="delete-button" on:click={deactivateItem}>x</button>
+    {#if item.is_active}
+        <button class="deactivate-button" on:click={deactivateItem}>x</button>
+    {:else}
+        <button class="activate-button" on:click={activateItem}>+</button>
+    {/if}
     <div class="item-content">
-        <!-- Display quantity, unit, then name -->
         {item.quantity}
         {item.unit}
         {item.name}
@@ -36,7 +62,8 @@
         margin: 0.5rem 0;
     }
 
-    .delete-button,
+    .deactivate-button,
+    .activate-button,
     .info-button {
         cursor: pointer;
         padding: 0.25rem 0.5rem;
@@ -46,7 +73,8 @@
         border-radius: 4px;
     }
 
-    .delete-button {
+    .deactivate-button,
+    .activate-button {
         margin-right: 1rem;
     }
 
