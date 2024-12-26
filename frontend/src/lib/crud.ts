@@ -67,10 +67,11 @@ class WebSocketCRUD {
      * Search items.
      * @param query The search query.
      * @param limit The maximum number of results to return.
+     * @param filters Additional filters to apply.
      * @returns A promise that resolves with the search results.
      */
-    async searchItems(query: string, limit: number = 10): Promise<Item[]> {
-        return this.sendAction("search", { query, limit });
+    async searchItems(query: string, limit: number = 10, filters: ItemFilter = {}): Promise<Item[]> {
+        return this.sendAction("search", { query, limit, filters });
     }
 
     /**

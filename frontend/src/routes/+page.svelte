@@ -1,8 +1,10 @@
 <script lang="ts">
 	import List from "$lib/List.svelte";
 	import Tab from "$lib/Tab.svelte";
+	import Search from "$lib/Search.svelte";
 </script>
 
+<Search />
 <Tab />
 <List />
 

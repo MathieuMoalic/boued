@@ -21,13 +21,11 @@ class WebSocketClient {
         this.socket = new WebSocket(this.url);
 
         this.socket.addEventListener("open", (event) => {
-            console.log("WebSocket connection established.");
             this.onOpenHandler && this.onOpenHandler(event);
         });
 
         this.socket.addEventListener("message", (event) => {
             const data = JSON.parse(event.data);
-            console.log("WebSocket message received:", data);
             this.onMessageHandler && this.onMessageHandler(data);
         });
 
@@ -37,7 +35,6 @@ class WebSocketClient {
         });
 
         this.socket.addEventListener("close", (event) => {
-            console.log("WebSocket connection closed.");
             this.onCloseHandler && this.onCloseHandler(event);
             this.socket = null; // Reset the socket
         });
@@ -60,7 +57,6 @@ class WebSocketClient {
         this.waitForOpenConnection()
             .then(() => {
                 this.socket?.send(JSON.stringify(message));
-                console.log("WebSocket message sent:", message);
             })
             .catch((error) => {
                 console.error("Failed to send message:", error);

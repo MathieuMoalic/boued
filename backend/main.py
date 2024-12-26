@@ -62,7 +62,8 @@ async def websocket_endpoint(websocket: WebSocket):
             elif action == "search":
                 query = payload.get("query")
                 limit = payload.get("limit", 10)
-                result = search_items(query, limit)
+                filters = payload.get("filters", ItemFilter())
+                result = search_items(query, limit, filters)
                 await websocket.send_json({"status": "success", "data": result})
             elif action == "read_filtered":
                 filters = payload.get("filters", {})
@@ -125,14 +126,6 @@ def delete_item(item_id: int):
         return item.model_dump()
 
 
-def search_items(query: str, limit: int = 10):
-    with Session(engine) as session:
-        items = session.exec(select(Item)).all()
-        item_names = {item.name: item for item in items}
-        matches = process.extract(query, item_names.keys(), limit=limit)
-        return [item_names[match[0]].model_dump() for match in matches]
-
-
 class ItemFilter(BaseModel):
     is_active: Optional[bool] = None
     category: Optional[str] = None
@@ -149,6 +142,25 @@ class ItemFilter(BaseModel):
             if field not in valid_fields:
                 raise ValueError(f"Unknown filter '{field}' passed.")
         return values
+
+
+def search_items(query: str, limit: int, raw_filters: dict[str, Any]):
+    try:
+        # Validate filters using the ItemFilter model validator
+        filters = ItemFilter(**raw_filters)
+    except ValidationError as e:
+        raise ValueError(f"Invalid filters: {str(e)}")
+
+    with Session(engine) as session:
+        query_builder = select(Item)
+        if filters.is_active is not None:
+            query_builder = query_builder.where(Item.is_active == filters.is_active)
+        if filters.category is not None:
+            query_builder = query_builder.where(Item.category == filters.category)
+        items = session.exec(query_builder).all()
+        item_names = {item.name: item for item in items}
+        matches = process.extract(query, item_names.keys(), limit=limit)
+        return [item_names[match[0]].model_dump() for match in matches]
 
 
 def read_filtered_items(raw_filters: dict[str, Any]) -> list[dict[str, Any]]:
