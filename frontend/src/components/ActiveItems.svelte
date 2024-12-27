@@ -8,7 +8,7 @@
     <List tag="ul" class="space-y-1 text-gray-200">
         {#each $items as item}
             {#if item.is_active}
-                <ItemComp {item} onItemUpdated={() => {}} />
+                <ItemComp {item} />
             {/if}
         {/each}
     </List>

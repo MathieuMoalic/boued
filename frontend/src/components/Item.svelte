@@ -1,64 +1,47 @@
 <script lang="ts">
     import type { Item } from "$lib/types";
-    import { ws } from "$lib/store";
-    import {
-        CloseCircleSolid,
-        CirclePlusSolid,
-        InfoCircleSolid,
-    } from "flowbite-svelte-icons";
+    import { items, ws, searching } from "$lib/store";
+    import { CloseCircleSolid, CirclePlusSolid } from "flowbite-svelte-icons";
     import { Li } from "flowbite-svelte";
+    import Notes from "$components/Notes.svelte";
     export let item: Item;
-    export let onItemUpdated: (updatedItem: Item) => void;
 
-    async function deactivateItem() {
+    async function onclick() {
         if (item.id === undefined) {
             console.error("Item ID is undefined.");
             return;
         }
         try {
-            await $ws.updateItem(item.id, { is_active: false });
-            item.is_active = false;
-            onItemUpdated(item);
+            for (let i = 0; i < $items.length; i++) {
+                if ($items[i].id === item.id) {
+                    $items[i].is_active = !$items[i].is_active;
+                    $ws.updateItem(item.id, { is_active: !item.is_active });
+                    item = $items[i];
+                    break;
+                }
+            }
         } catch (error) {
             console.error(`Failed to deactivate item '${item.name}':`, error);
         }
     }
-
-    async function activateItem() {
-        if (item.id === undefined) {
-            console.error("Item ID is undefined.");
-            return;
-        }
-        try {
-            await $ws.updateItem(item.id, { is_active: true });
-            item.is_active = true;
-            onItemUpdated(item);
-        } catch (error) {
-            console.error(`Failed to activate item '${item.name}':`, error);
-        }
-    }
-
-    function showInfo() {
-        console.log("i");
-    }
 </script>
 
-<Li icon>
-    {#if item.is_active}
-        <button on:click={deactivateItem}>
-            <CloseCircleSolid />
-        </button>
-    {:else}
-        <button on:click={activateItem}>
-            <CirclePlusSolid />
-        </button>
-    {/if}
+<Li icon class="m-2 {item.is_active ? 'text-gray-50' : 'text-gray-500'}" id="1">
+    <div class="mr-2">
+        {#if item.is_active}
+            <button on:click={onclick}>
+                <CloseCircleSolid />
+            </button>
+        {:else}
+            <button on:click={onclick}>
+                <CirclePlusSolid />
+            </button>
+        {/if}
+    </div>
     {item.quantity}
     {item.unit}
     {item.name}
     {#if item.notes !== ""}
-        <button on:click={showInfo}>
-            <InfoCircleSolid />
-        </button>
+        <Notes notes={item.notes} />
     {/if}
 </Li>

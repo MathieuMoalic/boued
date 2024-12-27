@@ -19,6 +19,6 @@
 	<SearchResult />
 {:else}
 	<ActiveItems />
-	<hr />
+	<hr class="m-4" />
 	<InactiveItems />
 {/if}

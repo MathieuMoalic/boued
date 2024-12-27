@@ -5,11 +5,10 @@
 </script>
 
 <main>
-    <Heading tag="h5" class="text-gray-500">Inactive</Heading>
     <List tag="ul" class="space-y-1 text-gray-500">
         {#each $items as item}
             {#if !item.is_active}
-                <ItemComp {item} onItemUpdated={() => {}} />
+                <ItemComp {item} />
             {/if}
         {/each}
     </List>
