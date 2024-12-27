@@ -1,15 +1,24 @@
 <script lang="ts">
-	import List from "$components/List.svelte";
+	import ActiveItems from "$components/ActiveItems.svelte";
+	import InactiveItems from "$components/InactiveItems.svelte";
 	import Search from "$components/Search.svelte";
+	import SearchResult from "$components/SearchResult.svelte";
+	import { items, searching, ws } from "$lib/store";
+	import { onMount } from "svelte";
+	let isReady = false;
+	onMount(async () => {
+		$items = await $ws.readAllItems();
+		isReady = true;
+	});
 </script>
 
 <Search />
-<List />
-
-<style>
-	:global(body) {
-		font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-		background-image: url("/background.avif");
-		background-attachment: fixed;
-	}
-</style>
+{#if !isReady}
+	<p>Loading...</p>
+{:else if $searching}
+	<SearchResult />
+{:else}
+	<ActiveItems />
+	<hr />
+	<InactiveItems />
+{/if}

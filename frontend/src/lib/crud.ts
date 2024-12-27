@@ -1,5 +1,7 @@
 import WebSocketClient from "./websocket";
 import { type Item, type ItemFilter } from "./types";
+import { items } from "./store";
+import { get } from "svelte/store";
 
 class WebSocketCRUD {
     private wsClient: WebSocketClient;
