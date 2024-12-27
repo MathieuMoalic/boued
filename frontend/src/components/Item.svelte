@@ -20,6 +20,7 @@
                     break;
                 }
             }
+            $items = [...$items];
         } catch (error) {
             console.error(`Failed to deactivate item '${item.name}':`, error);
         }
