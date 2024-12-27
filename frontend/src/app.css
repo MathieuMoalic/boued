@@ -1,0 +1,9 @@
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
+body {
+    font-family: "Segoe UI", sans-serif;
+    background-image: url("/background.avif");
+    background-attachment: fixed;
+}

@@ -12,6 +12,9 @@ const config = {
 			precompress: false,
 			strict: true
 		}),
+		alias: {
+			$components: './src/components',
+		},
 	},
 };
 export default config;
