@@ -8,35 +8,34 @@
     } from "flowbite-svelte-icons";
     import { Li } from "flowbite-svelte";
     export let item: Item;
+    export let onItemUpdated: (updatedItem: Item) => void;
 
-    function deactivateItem() {
+    async function deactivateItem() {
         if (item.id === undefined) {
             console.error("Item ID is undefined.");
             return;
         }
-        $ws.updateItem(item.id, { is_active: false })
-            .catch((error: any) => {
-                console.error(
-                    `Failed to deactivate item '${item.name}':`,
-                    error,
-                );
-            })
-            .then(() => {
-                item.is_active = false;
-            });
+        try {
+            await $ws.updateItem(item.id, { is_active: false });
+            item.is_active = false;
+            onItemUpdated(item);
+        } catch (error) {
+            console.error(`Failed to deactivate item '${item.name}':`, error);
+        }
     }
-    function activateItem() {
+
+    async function activateItem() {
         if (item.id === undefined) {
             console.error("Item ID is undefined.");
             return;
         }
-        $ws.updateItem(item.id, { is_active: true })
-            .catch((error: any) => {
-                console.error(`Failed to activate item '${item.name}':`, error);
-            })
-            .then(() => {
-                item.is_active = true;
-            });
+        try {
+            await $ws.updateItem(item.id, { is_active: true });
+            item.is_active = true;
+            onItemUpdated(item);
+        } catch (error) {
+            console.error(`Failed to activate item '${item.name}':`, error);
+        }
     }
 
     function showInfo() {
