@@ -1,8 +1,16 @@
 export interface Item {
-    id?: number;
+    id: number;
     name: string;
     category: string;
     is_active?: boolean;
+    notes?: string;
+    quantity?: number;
+    unit?: string;
+}
+
+export interface ItemForm {
+    name: string;
+    category: string;
     notes?: string;
     quantity?: number;
     unit?: string;

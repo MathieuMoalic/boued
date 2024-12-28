@@ -1,14 +1,17 @@
 <script lang="ts">
-    import { Button, Modal } from "flowbite-svelte";
+    import type { Item } from "$lib/types";
+    import { Modal } from "flowbite-svelte";
     import { InfoCircleSolid } from "flowbite-svelte-icons";
     let clickOutsideModal = false;
-    export let notes: string | undefined;
+    export let item: Item;
 </script>
 
-<button on:click={() => (clickOutsideModal = true)} class="ml-2">
-    <InfoCircleSolid />
-</button>
+{#if item.notes !== ""}
+    <button on:click={() => (clickOutsideModal = true)} class="ml-2">
+        <InfoCircleSolid />
+    </button>
 
-<Modal bind:open={clickOutsideModal} autoclose outsideclose size="xs">
-    {notes}
-</Modal>
+    <Modal bind:open={clickOutsideModal} autoclose outsideclose size="xs">
+        {item.notes}
+    </Modal>
+{/if}
