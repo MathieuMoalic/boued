@@ -20,3 +20,7 @@ export interface ItemFilter {
     category?: string;
     is_active?: boolean;
 }
+
+export let possibleUnits = ["None", "kg", "g", "l", "ml", "pcs", "cans", "bottles"];
+
+export let possibleCategories = ["Other", "Fruit", "Vegetable", "Bread", "Canned", "Frozen", "Beverage", "Snack", "Alcohol", "Cleaning"];

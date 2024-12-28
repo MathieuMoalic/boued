@@ -1,7 +1,5 @@
 import WebSocketClient from "./websocket";
-import { type Item, type ItemFilter } from "./types";
-import { items } from "./store";
-import { get } from "svelte/store";
+import { type Item, type ItemFilter, type ItemForm } from "./types";
 
 class WebSocketCRUD {
     private wsClient: WebSocketClient;
@@ -16,7 +14,7 @@ class WebSocketCRUD {
      * @param item The item to create.
      * @returns A promise that resolves with the server's response.
      */
-    async createItem(item: Item): Promise<any> {
+    async createItem(item: ItemForm): Promise<any> {
         return this.sendAction("create", item);
     }
 

@@ -3,6 +3,7 @@
 	import InactiveItems from "$components/InactiveItems.svelte";
 	import Search from "$components/Search.svelte";
 	import SearchResult from "$components/SearchResult.svelte";
+	import AddItem from "$components/AddItem.svelte";
 	import { items, searching, ws } from "$lib/store";
 	import { onMount } from "svelte";
 	let isReady = false;
@@ -22,3 +23,4 @@
 	<hr class="m-4" />
 	<InactiveItems />
 {/if}
+<AddItem />

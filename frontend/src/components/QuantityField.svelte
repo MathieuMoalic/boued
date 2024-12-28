@@ -27,7 +27,9 @@
 </script>
 
 <div>
-    {#if editing}
+    {#if item.quantity === null}
+        <span class="text-gray-200"></span>
+    {:else if editing}
         <input
             bind:value={newQuantity}
             class="w-12 h-6 mr-3 text-center rounded bg-red-700 text-gray-200"
@@ -38,7 +40,7 @@
         <button
             type="button"
             on:click={() => (editing = true)}
-            class="w-12 mr-3 p-1"
+            class="p-1"
             aria-label="Edit quantity"
         >
             {item.quantity}

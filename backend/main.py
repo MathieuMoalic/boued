@@ -80,6 +80,7 @@ async def websocket_endpoint(websocket: WebSocket):
 def create_item(data: dict):
     with Session(engine) as session:
         item = Item(**data)
+        item.is_active = True
         existing_item = session.exec(select(Item).where(Item.name == item.name)).first()
         if existing_item:
             raise ValueError("Item with this name already exists.")
