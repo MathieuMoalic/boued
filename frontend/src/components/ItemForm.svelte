@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { addAlert } from "$lib/alert";
     import { ws, items, modal } from "$lib/store";
     import { possibleCategories, possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input } from "flowbite-svelte";
@@ -15,11 +16,13 @@
                 }
                 $modal.isOpen = false;
                 $modal.itemID = -1;
+                addAlert("Item updated", "success");
             } catch (error) {
                 console.error(
                     `Failed to update the item '${$modal.item.name}':`,
                     error,
                 );
+                addAlert("Failed to update the item", "error");
             }
             $modal.isOpen = false;
             return;
@@ -29,11 +32,13 @@
                 let item = await $ws.createItem($modal.item);
                 items.update((items) => [...items, item]);
                 $modal.isOpen = false;
+                addAlert("Item created", "success");
             } catch (error) {
                 console.error(
                     `Failed to create the item '${$modal.item.name}':`,
                     error,
                 );
+                addAlert("Failed to create the item", "error");
             }
         }
     }
@@ -45,11 +50,13 @@
             );
             $modal.isOpen = false;
             $modal.itemID = -1;
+            addAlert("Item deleted", "success");
         } catch (error) {
             console.error(
                 `Failed to delete the item '${$modal.item.name}':`,
                 error,
             );
+            addAlert("Failed to delete the item", "error");
         }
     }
 </script>

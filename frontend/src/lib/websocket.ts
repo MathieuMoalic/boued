@@ -1,3 +1,5 @@
+import { addAlert } from "./alert";
+
 type WebSocketEventHandler = (data: any) => void;
 
 class WebSocketClient {
@@ -31,6 +33,7 @@ class WebSocketClient {
 
         this.socket.addEventListener("error", (event) => {
             console.error("WebSocket error:", event);
+            addAlert("WebSocket error", "error");
             this.onErrorHandler && this.onErrorHandler(event);
         });
 
@@ -60,6 +63,7 @@ class WebSocketClient {
             })
             .catch((error) => {
                 console.error("Failed to send message:", error);
+                addAlert("Failed to send message", "error");
             });
     }
 

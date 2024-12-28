@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { addAlert } from "$lib/alert";
     import { ws, items } from "$lib/store";
     import type { Item } from "$lib/types";
     import { CloseOutline, PlusOutline } from "flowbite-svelte-icons";
@@ -19,6 +20,7 @@
                 `Failed to toggle active status for item '${item.name}':`,
                 error,
             );
+            addAlert("Failed to toggle the active status", "error");
         }
     }
 </script>

@@ -16,8 +16,6 @@
             notes: "",
         };
         $modal.isOpen = true;
-        console.log("AddItemButton clicked");
-        console.log($modal);
     }}
 >
     +

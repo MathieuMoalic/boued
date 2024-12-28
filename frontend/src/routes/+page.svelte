@@ -7,6 +7,7 @@
 	import { items, searching, ws } from "$lib/store";
 	import { onMount } from "svelte";
 	import AddItemButton from "$components/AddItemButton.svelte";
+	import Alert from "$components/Alert.svelte";
 	let isReady = false;
 	onMount(async () => {
 		$items = await $ws.readAllItems();
@@ -26,3 +27,4 @@
 {/if}
 <ItemForm />
 <AddItemButton />
+<Alert />

@@ -14,7 +14,7 @@
 
 <Li
     icon
-    class="m-2 flex justify-between items-center {item.is_active
+    class="m-2 flex justify-between  items-center {item.is_active
         ? 'text-gray-50'
         : 'text-gray-500'}"
     id="1"

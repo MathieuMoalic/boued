@@ -3,6 +3,7 @@
 
     import { ws } from "$lib/store";
     import { type Item, possibleUnits } from "$lib/types";
+    import { addAlert } from "$lib/alert";
 
     export let item: Item;
 
@@ -19,6 +20,7 @@
                 `Failed to update unit for item '${item.name}':`,
                 error,
             );
+            addAlert("Failed to update the unit", "error");
         }
     }
 </script>

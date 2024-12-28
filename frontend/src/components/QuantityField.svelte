@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { addAlert } from "$lib/alert";
     import { ws } from "$lib/store";
     import type { Item } from "$lib/types";
     export let item: Item;
@@ -20,6 +21,7 @@
                 `Failed to update quantity for item '${item.name}':`,
                 error,
             );
+            addAlert("Failed to update the quantity", "error");
         } finally {
             editing = false;
         }
