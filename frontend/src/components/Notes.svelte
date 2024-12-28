@@ -1,17 +1,24 @@
 <script lang="ts">
     import type { Item } from "$lib/types";
     import { Modal } from "flowbite-svelte";
-    import { InfoCircleSolid } from "flowbite-svelte-icons";
     let clickOutsideModal = false;
     export let item: Item;
 </script>
 
 {#if item.notes !== ""}
-    <button on:click={() => (clickOutsideModal = true)} class="ml-2">
-        <InfoCircleSolid />
-    </button>
+    <div class="flex items-center pl-2 overflow-hidden">
+        <button
+            on:click={() => (clickOutsideModal = true)}
+            class="ml-1 flex-shrink-0 text-gray-500 truncate overflow-hidden text-ellipsis whitespace-nowrap max-w-xs"
+            title={item.notes}
+        >
+            | {item.notes}
+        </button>
 
-    <Modal bind:open={clickOutsideModal} autoclose outsideclose size="xs">
-        {item.notes}
-    </Modal>
+        <Modal bind:open={clickOutsideModal} autoclose outsideclose>
+            <div class="pr-1">
+                {item.notes}
+            </div>
+        </Modal>
+    </div>
 {/if}

@@ -37,6 +37,21 @@
             }
         }
     }
+    async function deleteItem() {
+        try {
+            await $ws.deleteItem($modal.itemID);
+            items.update((items) =>
+                items.filter((item) => item.id != $modal.itemID),
+            );
+            $modal.isOpen = false;
+            $modal.itemID = -1;
+        } catch (error) {
+            console.error(
+                `Failed to delete the item '${$modal.item.name}':`,
+                error,
+            );
+        }
+    }
 </script>
 
 <Modal bind:open={$modal.isOpen} size="xs" outsideclose>
@@ -139,5 +154,10 @@
                 Add item
             {/if}
         </Button>
+        {#if $modal.mode == "edit"}
+            <Button type="submit" class="w-full" on:click={deleteItem}>
+                Delete item
+            </Button>
+        {/if}
     </div>
 </Modal>

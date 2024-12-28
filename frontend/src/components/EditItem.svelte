@@ -2,13 +2,15 @@
     import { Button } from "flowbite-svelte";
     import { modal } from "$lib/store";
     import type { Item } from "$lib/types";
+    import { EditOutline } from "flowbite-svelte-icons";
 
     export let item: Item;
 </script>
 
 <Button
-    size="xs"
-    class="right-4"
+    size="sm"
+    class="m-1 p-1 border-0"
+    outline
     on:click={() => {
         $modal.mode = "edit";
         $modal.item = item;
@@ -16,5 +18,5 @@
         $modal.itemID = item.id;
     }}
 >
-    x
+    <EditOutline size="md" />
 </Button>

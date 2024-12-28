@@ -1,7 +1,7 @@
 <script lang="ts">
     import { ws, items } from "$lib/store";
     import type { Item } from "$lib/types";
-    import { CloseCircleSolid, CirclePlusSolid } from "flowbite-svelte-icons";
+    import { CloseOutline, PlusOutline } from "flowbite-svelte-icons";
     export let item: Item;
 
     async function toggleActive() {
@@ -23,14 +23,14 @@
     }
 </script>
 
-<div class="mr-2">
+<div class="mr-1 mt-1.5">
     {#if item.is_active}
         <button on:click={toggleActive}>
-            <CloseCircleSolid />
+            <CloseOutline />
         </button>
     {:else}
         <button on:click={toggleActive}>
-            <CirclePlusSolid />
+            <PlusOutline />
         </button>
     {/if}
 </div>
