@@ -3,9 +3,10 @@
 	import InactiveItems from "$components/InactiveItems.svelte";
 	import Search from "$components/Search.svelte";
 	import SearchResult from "$components/SearchResult.svelte";
-	import AddItem from "$components/AddItem.svelte";
+	import ItemForm from "$components/ItemForm.svelte";
 	import { items, searching, ws } from "$lib/store";
 	import { onMount } from "svelte";
+	import AddItemButton from "$components/AddItemButton.svelte";
 	let isReady = false;
 	onMount(async () => {
 		$items = await $ws.readAllItems();
@@ -23,4 +24,5 @@
 	<hr class="m-4" />
 	<InactiveItems />
 {/if}
-<AddItem />
+<ItemForm />
+<AddItemButton />

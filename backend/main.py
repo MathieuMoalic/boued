@@ -1,4 +1,5 @@
 import json
+import logging
 from typing import Any, Optional
 
 from fastapi import FastAPI, WebSocket
@@ -6,6 +7,10 @@ from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, ValidationError, model_validator
 from rapidfuzz import process
 from sqlmodel import Field, Session, SQLModel, create_engine, select
+
+# Setup logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("websocket")
 
 
 class Item(SQLModel, table=True):
@@ -20,7 +25,7 @@ class Item(SQLModel, table=True):
 
 # Database setup
 database_url = "sqlite:///./test.db"
-engine = create_engine(database_url, echo=True)
+engine = create_engine(database_url, echo=False)  # Disable SQL debug logs
 SQLModel.metadata.create_all(engine)
 
 app = FastAPI()
@@ -34,47 +39,52 @@ def get_session():
 @app.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
+    logger.info("WebSocket connection established")
     async for message in websocket.iter_text():
         try:
             data = json.loads(message)
+            logger.info(f"Received WebSocket message: {data}")
             action = data.get("action")
             payload = data.get("payload")
 
             if action == "create":
                 result = create_item(payload)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "read_all":
                 result = read_items()
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "read_one":
                 item_id = payload.get("id")
                 result = read_item(item_id)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "update":
                 item_id = payload.get("id")
                 update_data = payload.get("data")
                 result = update_item(item_id, update_data)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "delete":
                 item_id = payload.get("id")
                 result = delete_item(item_id)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "search":
                 query = payload.get("query")
                 limit = payload.get("limit", 10)
-                filters = payload.get("filters", ItemFilter())
+                filters = payload.get("filters", {})
                 result = search_items(query, limit, filters)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             elif action == "read_filtered":
                 filters = payload.get("filters", {})
                 result = read_filtered_items(filters)
-                await websocket.send_json({"status": "success", "data": result})
+                response = {"status": "success", "data": result}
             else:
-                await websocket.send_json(
-                    {"status": "error", "message": "Invalid action"}
-                )
+                response = {"status": "error", "message": "Invalid action"}
+
+            logger.info(f"Sending WebSocket response: {response}")
+            await websocket.send_json(response)
         except Exception as e:
-            await websocket.send_json({"status": "error", "message": str(e)})
+            error_response = {"status": "error", "message": str(e)}
+            logger.error(f"Error processing WebSocket message: {error_response}")
+            await websocket.send_json(error_response)
 
 
 def create_item(data: dict):

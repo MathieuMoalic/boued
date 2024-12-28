@@ -1,33 +1,45 @@
 <script lang="ts">
-    import { ws, items } from "$lib/store";
+    import { ws, items, modal } from "$lib/store";
     import { possibleCategories, possibleUnits } from "$lib/types";
-    import { SpeedDial, Button, Modal, Label, Input } from "flowbite-svelte";
-    let open = false;
-    let name = "";
-    let quantity: number | undefined;
-    let category = possibleCategories[0];
-    let unit = possibleUnits[0];
-    let notes = "";
-    let submitItem = async () => {
-        try {
-            let item = await $ws.createItem({
-                name,
-                quantity,
-                category,
-                unit,
-                notes,
-            });
-            items.update((items) => [...items, item]);
-        } catch (error) {
-            console.error(`Failed to create the item '${name}':`, error);
+    import { Button, Modal, Label, Input } from "flowbite-svelte";
+
+    async function submitItem() {
+        if ($modal.mode == "edit") {
+            try {
+                let item = await $ws.updateItem($modal.itemID, $modal.item);
+                for (let i = 0; i < $items.length; i++) {
+                    if ($items[i].id == item.id) {
+                        $items[i] = item;
+                        break;
+                    }
+                }
+                $modal.isOpen = false;
+                $modal.itemID = -1;
+            } catch (error) {
+                console.error(
+                    `Failed to update the item '${$modal.item.name}':`,
+                    error,
+                );
+            }
+            $modal.isOpen = false;
+            return;
+        } else if ($modal.mode == "add") {
+            $modal.mode = "edit";
+            try {
+                let item = await $ws.createItem($modal.item);
+                items.update((items) => [...items, item]);
+                $modal.isOpen = false;
+            } catch (error) {
+                console.error(
+                    `Failed to create the item '${$modal.item.name}':`,
+                    error,
+                );
+            }
         }
-        open = false;
-    };
+    }
 </script>
 
-<SpeedDial trigger="click" bind:open></SpeedDial>
-
-<Modal bind:open size="xs">
+<Modal bind:open={$modal.isOpen} size="xs" outsideclose>
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
@@ -35,14 +47,20 @@
         role="dialog"
         on:click={(e) => e.stopPropagation()}
     >
-        <h3 class="mb-4 text-xl font-medium text-gray-900">Add a new item</h3>
+        <h3 class="mb-4 text-xl font-medium text-gray-900">
+            {#if $modal.mode == "edit"}
+                Edit item
+            {:else}
+                Add a new item
+            {/if}
+        </h3>
 
         <Label class="space-y-2">
             <span>Name</span>
             <Input
                 type="text"
                 name="name"
-                bind:value={name}
+                bind:value={$modal.item.name}
                 placeholder="Click to enter a name"
                 required
             />
@@ -53,7 +71,7 @@
             <Input
                 type="number"
                 name="quantity"
-                bind:value={quantity}
+                bind:value={$modal.item.quantity}
                 placeholder="Click to enter a quantity"
             />
         </Label>
@@ -64,14 +82,14 @@
                 {#each possibleUnits as choice}
                     <label
                         class="inline-flex items-center p-1 cursor-pointer {choice ==
-                        unit
+                        $modal.item.unit
                             ? 'bg-gray-50'
                             : 'bg-gray-500'}"
                     >
                         <input
                             type="radio"
                             value={choice}
-                            on:click={() => (unit = choice)}
+                            on:click={() => ($modal.item.unit = choice)}
                             name="unit"
                             class="hidden"
                         />
@@ -87,14 +105,14 @@
                 {#each possibleCategories as choice}
                     <label
                         class="inline-flex items-center p-1 cursor-pointer {choice ==
-                        category
+                        $modal.item.category
                             ? 'bg-gray-50'
                             : 'bg-gray-500'}"
                     >
                         <input
                             type="radio"
                             value={choice}
-                            on:click={() => (category = choice)}
+                            on:click={() => ($modal.item.category = choice)}
                             name="category"
                             class="hidden"
                         />
@@ -109,13 +127,17 @@
             <Input
                 type="text"
                 name="notes"
-                bind:value={notes}
+                bind:value={$modal.item.notes}
                 placeholder="Click to enter notes"
             />
         </Label>
 
-        <Button type="submit" class="w-full" on:click={submitItem}
-            >Add item</Button
-        >
+        <Button type="submit" class="w-full" on:click={submitItem}>
+            {#if $modal.mode == "edit"}
+                Edit item
+            {:else}
+                Add item
+            {/if}
+        </Button>
     </div>
 </Modal>

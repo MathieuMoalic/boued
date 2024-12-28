@@ -24,3 +24,10 @@ export interface ItemFilter {
 export let possibleUnits = ["None", "kg", "g", "l", "ml", "pcs", "cans", "bottles"];
 
 export let possibleCategories = ["Other", "Fruit", "Vegetable", "Bread", "Canned", "Frozen", "Beverage", "Snack", "Alcohol", "Cleaning"];
+
+export interface modalState {
+    isOpen: boolean;
+    item: ItemForm;
+    itemID: number;
+    mode: "edit" | "add";
+} 

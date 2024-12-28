@@ -7,6 +7,7 @@
     import NameField from "$components/NameField.svelte";
     import Notes from "$components/Notes.svelte";
     import ToggleActive from "$components/ToggleActive.svelte";
+    import EditItem from "./EditItem.svelte";
 
     export let item: Item;
 </script>
@@ -17,4 +18,5 @@
     <UnitField {item} />
     <NameField {item} />
     <Notes {item} />
+    <EditItem {item} />
 </Li>

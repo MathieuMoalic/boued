@@ -1,7 +1,7 @@
 import WebSocketCRUD from '$lib/crud';
 import { writable, derived } from "svelte/store";
 import Fuse from "fuse.js";
-import type { Item } from "$lib/types";
+import type { Item, modalState } from "$lib/types";
 
 export const ws = writable<WebSocketCRUD>(new WebSocketCRUD("/ws"));
 export const items = writable<Item[]>([]);
@@ -23,3 +23,11 @@ export const searchResults = derived(
         return $fuse.search($searchTerm).map((result) => result.item);
     }
 );
+
+export const modal = writable<modalState>({
+    isOpen: false, item: {
+        name: "",
+        category: "Other",
+    }, mode: "add",
+    itemID: -1,
+});
