@@ -4,6 +4,16 @@
     import { possibleCategories, possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input } from "flowbite-svelte";
 
+    let textColor = "text-gray-300";
+    let backgroundColor = "bg-gray-900";
+    let inputBgColor = "bg-gray-800";
+    let inputBorderColor = "border-gray-700";
+    let primaryColor = "bg-primary-600";
+    let primaryHoverColor = "bg-primary-700";
+    let primaryRingColor = "focus:ring-primary-500";
+    let dangerColor = "bg-red-600";
+    let dangerHoverColor = "bg-red-700";
+
     async function submitItem() {
         if ($modal.mode == "edit") {
             try {
@@ -24,7 +34,6 @@
                 );
                 addAlert("Failed to update the item", "error");
             }
-            $modal.isOpen = false;
             return;
         } else if ($modal.mode == "add") {
             $modal.mode = "edit";
@@ -42,6 +51,7 @@
             }
         }
     }
+
     async function deleteItem() {
         try {
             await $ws.deleteItem($modal.itemID);
@@ -61,52 +71,59 @@
     }
 </script>
 
-<Modal bind:open={$modal.isOpen} size="xs" outsideclose>
+<Modal
+    bind:open={$modal.isOpen}
+    size="xs"
+    outsideclose
+    class={`${backgroundColor} text-gray-100 rounded-lg`}
+>
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-        class="flex flex-col space-y-6"
+        class={`flex flex-col space-y-4 p-3 rounded-lg shadow-lg ${backgroundColor} ${textColor}`}
         role="dialog"
         on:click={(e) => e.stopPropagation()}
     >
-        <h3 class="mb-4 text-xl font-medium text-gray-900">
+        <h3 class="text-lg font-semibold text-gray-100">
             {#if $modal.mode == "edit"}
-                Edit item
+                Edit Item
             {:else}
-                Add a new item
+                Add a New Item
             {/if}
         </h3>
 
-        <Label class="space-y-2">
+        <Label class={`space-y-1 text-sm ${textColor}`}>
             <span>Name</span>
             <Input
                 type="text"
                 name="name"
                 bind:value={$modal.item.name}
-                placeholder="Click to enter a name"
+                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                placeholder="Enter a name"
                 required
             />
         </Label>
 
-        <Label class="space-y-2">
-            <span>Quantity (Optional)</span>
+        <Label class={`space-y-1 text-sm ${textColor}`}>
+            <span>Quantity</span>
             <Input
                 type="number"
                 name="quantity"
                 bind:value={$modal.item.quantity}
-                placeholder="Click to enter a quantity"
+                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                placeholder="Enter quantity"
             />
         </Label>
 
-        <div class="text-gray-900">
-            <span>Unit (Optional)</span>
-            <div class="m-1 grid grid-cols-4 gap-2">
+        <div>
+            <span class={`block text-sm font-medium ${textColor}`}>Unit</span>
+            <div class="m-1 grid grid-cols-4 gap-1">
                 {#each possibleUnits as choice}
                     <label
-                        class="inline-flex items-center p-1 cursor-pointer {choice ==
-                        $modal.item.unit
-                            ? 'bg-gray-50'
-                            : 'bg-gray-500'}"
+                        class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
+                        ${choice == $modal.item.unit ? primaryColor : inputBgColor}
+                        ${choice == $modal.item.unit ? "text-gray-100" : textColor}
+                        hover:${primaryHoverColor}`}
                     >
                         <input
                             type="radio"
@@ -115,21 +132,23 @@
                             name="unit"
                             class="hidden"
                         />
-                        <span class="text-gray-700">{choice}</span>
+                        {choice}
                     </label>
                 {/each}
             </div>
         </div>
 
-        <div class="text-gray-900">
-            <span>Category (Optional)</span>
-            <div class="m-1 grid grid-cols-3 gap-2">
+        <div>
+            <span class={`block text-sm font-medium ${textColor}`}
+                >Category</span
+            >
+            <div class="m-1 grid grid-cols-3 gap-1">
                 {#each possibleCategories as choice}
                     <label
-                        class="inline-flex items-center p-1 cursor-pointer {choice ==
-                        $modal.item.category
-                            ? 'bg-gray-50'
-                            : 'bg-gray-500'}"
+                        class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
+                        ${choice == $modal.item.category ? primaryColor : inputBgColor}
+                        ${choice == $modal.item.category ? "text-gray-100" : textColor}
+                        hover:${primaryHoverColor}`}
                     >
                         <input
                             type="radio"
@@ -138,32 +157,42 @@
                             name="category"
                             class="hidden"
                         />
-                        <span class="text-gray-700">{choice}</span>
+                        {choice}
                     </label>
                 {/each}
             </div>
         </div>
 
-        <Label class="space-y-2">
-            <span>Notes (Optional)</span>
+        <Label class={`space-y-1 text-sm ${textColor}`}>
+            <span>Notes</span>
             <Input
                 type="text"
                 name="notes"
                 bind:value={$modal.item.notes}
-                placeholder="Click to enter notes"
+                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                placeholder="Enter notes"
             />
         </Label>
 
-        <Button type="submit" class="w-full" on:click={submitItem}>
+        <Button
+            type="submit"
+            class={`w-full py-2 ${primaryColor} hover:${primaryHoverColor} text-gray-100 font-semibold rounded-md`}
+            on:click={submitItem}
+        >
             {#if $modal.mode == "edit"}
-                Edit item
+                Save
             {:else}
-                Add item
+                Add Item
             {/if}
         </Button>
+
         {#if $modal.mode == "edit"}
-            <Button type="submit" class="w-full" on:click={deleteItem}>
-                Delete item
+            <Button
+                type="button"
+                class={`w-full py-2 ${dangerColor} hover:${dangerHoverColor} text-gray-100 font-semibold rounded-md`}
+                on:click={deleteItem}
+            >
+                Delete
             </Button>
         {/if}
     </div>
