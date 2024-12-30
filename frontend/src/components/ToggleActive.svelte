@@ -1,27 +1,27 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { items } from "$lib/store";
+    import { api, items } from "$lib/store";
     import type { ItemRead } from "$lib/Api";
     import { CloseOutline, PlusOutline } from "flowbite-svelte-icons";
     export let item: ItemRead;
 
     async function toggleActive() {
-        // try {
-        //     item.is_active = !item.is_active;
-        //     for (let i = 0; i < $items.length; i++) {
-        //         if ($items[i].id === item.id) {
-        //             $items[i].is_active = item.is_active;
-        //             break;
-        //         }
-        //     }
-        //     await $ws.updateItem(item.id, { is_active: item.is_active });
-        // } catch (error) {
-        //     console.error(
-        //         `Failed to toggle active status for item '${item.name}':`,
-        //         error,
-        //     );
-        //     addAlert("Failed to toggle the active status", "error");
-        // }
+        api.items
+            .update(item.id, { is_active: !item.is_active })
+            .then((_) => {
+                item.is_active = !item.is_active;
+                for (let i = 0; i < $items.length; i++) {
+                    if ($items[i].id === item.id) {
+                        $items[i].is_active = item.is_active;
+                    }
+                }
+            })
+            .catch((res) => {
+                addAlert(
+                    res.error.detail || "Failed to toggle the active status",
+                    "error",
+                );
+            });
     }
 </script>
 

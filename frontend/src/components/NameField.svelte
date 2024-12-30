@@ -1,7 +1,7 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    // import { ws } from "$lib/store";
     import type { ItemRead } from "$lib/Api";
+    import { api } from "$lib/store";
     export let item: ItemRead;
 
     let editing = false;
@@ -12,19 +12,16 @@
             editing = false;
             return;
         }
-
-        // try {
-        //     item.name = newName;
-        //     await $ws.updateItem(item.id, { name: newName });
-        // } catch (error) {
-        //     console.error(
-        //         `Failed to update name for item '${item.name}':`,
-        //         error,
-        //     );
-        //     addAlert("Failed to update the name", "error");
-        // } finally {
-        //     editing = false;
-        // }
+        api.items
+            .update(item.id, { name: newName })
+            .then((_) => {
+                item.name = newName;
+                addAlert("Name updated", "success");
+                editing = false;
+            })
+            .catch((res) => {
+                addAlert(res.error.detail || "Failed to update name", "error");
+            });
     }
 </script>
 

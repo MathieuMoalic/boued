@@ -1,10 +1,10 @@
 <script lang="ts">
     import { Dropdown, DropdownItem, Button } from "flowbite-svelte";
 
-    // import { ws } from "$lib/store";
     import { possibleUnits } from "$lib/types";
     import type { ItemRead } from "$lib/Api";
     import { addAlert } from "$lib/alert";
+    import { api } from "$lib/store";
 
     export let item: ItemRead;
 
@@ -12,17 +12,15 @@
 
     async function saveUnit(unit: string) {
         if (unit === item.unit) return;
-
-        // try {
-        //     item.unit = unit;
-        //     await $ws.updateItem(item.id, { unit });
-        // } catch (error) {
-        //     console.error(
-        //         `Failed to update unit for item '${item.name}':`,
-        //         error,
-        //     );
-        //     addAlert("Failed to update the unit", "error");
-        // }
+        api.items
+            .update(item.id, { unit })
+            .then((_) => {
+                item.unit = unit;
+                addAlert("Unit updated", "success");
+            })
+            .catch((res) => {
+                addAlert(res.error.detail || "Failed to update unit", "error");
+            });
     }
 </script>
 
