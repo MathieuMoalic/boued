@@ -5,16 +5,6 @@
     import { Button, Modal, Label, Input } from "flowbite-svelte";
     import CategoryForm from "./CategoryForm.svelte";
 
-    let textColor = "text-gray-300";
-    let backgroundColor = "bg-gray-900";
-    let inputBgColor = "bg-gray-800";
-    let inputBorderColor = "border-gray-700";
-    let primaryColor = "bg-primary-600";
-    let primaryHoverColor = "bg-primary-700";
-    let primaryRingColor = "focus:ring-primary-500";
-    let dangerColor = "bg-red-600";
-    let dangerHoverColor = "bg-red-700";
-
     async function submitItem() {
         if ($itemForm.mode == "edit") {
             let res = await api.items.update($itemForm.itemID, $itemForm.item);
@@ -92,16 +82,16 @@
     bind:open={$itemForm.isOpen}
     size="xs"
     outsideclose
-    class={`${backgroundColor} text-gray-100 rounded-lg`}
+    class="bg-primaryBg text-primaryText rounded-lg"
 >
     <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-        class={`flex flex-col space-y-4 p-3 rounded-lg shadow-lg ${backgroundColor} ${textColor}`}
+        class="flex flex-col space-y-4 p-3 rounded-lg shadow-lg bg-primaryBg text-primaryText"
         role="dialog"
         on:click={(e) => e.stopPropagation()}
     >
-        <h3 class="text-lg font-semibold text-gray-100">
+        <h3 class="text-lg font-semibold text-primaryText">
             {#if $itemForm.mode == "edit"}
                 Edit Item
             {:else}
@@ -109,38 +99,36 @@
             {/if}
         </h3>
 
-        <Label class={`space-y-1 text-sm ${textColor}`}>
+        <Label class="space-y-1 text-sm text-primaryText">
             <span>Name</span>
             <Input
                 type="text"
                 name="name"
                 bind:value={$itemForm.item.name}
-                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
                 placeholder="Enter a name"
                 required
             />
         </Label>
 
-        <Label class={`space-y-1 text-sm ${textColor}`}>
+        <Label class="space-y-1 text-sm text-primaryText">
             <span>Quantity</span>
             <Input
                 type="number"
                 name="quantity"
                 bind:value={$itemForm.item.quantity}
-                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
                 placeholder="Enter quantity"
             />
         </Label>
 
         <div>
-            <span class={`block text-sm font-medium ${textColor}`}>Unit</span>
+            <span class="block text-sm font-medium text-primaryText">Unit</span>
             <div class="m-1 grid grid-cols-4 gap-1">
                 {#each possibleUnits as choice}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                        ${choice == $itemForm.item.unit ? primaryColor : inputBgColor}
-                        ${choice == $itemForm.item.unit ? "text-gray-100" : textColor}
-                        hover:${primaryHoverColor}`}
+                         text-primaryText ${choice == $itemForm.item.unit ? "bg-buttonBg" : "bg-secondaryBg"}`}
                     >
                         <input
                             type="radio"
@@ -156,16 +144,18 @@
         </div>
 
         <div>
-            <span class={`block text-sm font-medium ${textColor}`}
+            <span class="block text-sm font-medium text-primaryText"
                 >Category</span
             >
             <div class="m-1 grid grid-cols-3 gap-1">
                 {#each $categories as category}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                        ${category.id == $itemForm.item.category_id ? primaryColor : inputBgColor}
-                        ${category.id == $itemForm.item.category_id ? "text-gray-100" : textColor}
-                        hover:${primaryHoverColor}`}
+                         text-primaryText ${
+                             category.id == $itemForm.item.category_id
+                                 ? "bg-buttonBg"
+                                 : "bg-secondaryBg"
+                         }`}
                     >
                         <input
                             type="radio"
@@ -179,28 +169,28 @@
                     </label>
                 {/each}
                 <label
-                    class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md ${inputBgColor}
-                        text-gray-100 hover:${primaryHoverColor}`}
+                    class="inline-flex items-center justify-center p-1 cursor-pointer rounded-md bg-secondaryBg
+                        text-primaryText"
                 >
                     <CategoryForm />
                 </label>
             </div>
         </div>
 
-        <Label class={`space-y-1 text-sm ${textColor}`}>
+        <Label class="space-y-1 text-sm text-primaryText">
             <span>Notes</span>
             <Input
                 type="text"
                 name="notes"
                 bind:value={$itemForm.item.notes}
-                class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
                 placeholder="Enter notes"
             />
         </Label>
 
         <Button
             type="submit"
-            class={`w-full py-2 ${primaryColor} hover:${primaryHoverColor} text-gray-100 font-semibold rounded-md`}
+            class="w-full py-2 bg-buttonBg text-primaryText font-semibold rounded-md"
             on:click={submitItem}
         >
             {#if $itemForm.mode == "edit"}
@@ -213,7 +203,7 @@
         {#if $itemForm.mode == "edit"}
             <Button
                 type="button"
-                class={`w-full py-2 ${dangerColor} hover:${dangerHoverColor} text-gray-100 font-semibold rounded-md`}
+                class="w-full py-2 bg-red-600 hover:bg-red-700 text-primaryText font-semibold rounded-md"
                 on:click={deleteItem}
             >
                 Delete

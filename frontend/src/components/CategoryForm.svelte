@@ -8,15 +8,6 @@
         EditOutline,
         PlusOutline,
     } from "flowbite-svelte-icons";
-    let textColor = "text-gray-300";
-    let backgroundColor = "bg-gray-800";
-    let inputBgColor = "bg-gray-700";
-    let inputBorderColor = "border-gray-700";
-    // let primaryColor = "bg-primary-600";
-    // let primaryHoverColor = "bg-primary-700";
-    let primaryRingColor = "focus:ring-primary-500";
-    // let dangerColor = "bg-red-600";
-    // let dangerHoverColor = "bg-red-700";
 
     let inputValue = "";
     async function addCategory() {
@@ -73,7 +64,7 @@
     bind:open={$categoryFormOpen}
     size="xs"
     outsideclose
-    class={`${backgroundColor} text-gray-100 rounded-lg`}
+    class="bg-secondaryBg text-gray-100 rounded-lg"
 >
     {#each $categories as category}
         <div class="flex ml-2">
@@ -93,7 +84,7 @@
         <Input
             placeholder="Add category"
             bind:value={inputValue}
-            class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+            class="bg-primaryBg border-inputBorderColor rounded-md primaryText`"
             on:keydown={(e) => e.key === "Enter" && addCategory()}
         />
         <button on:click={addCategory}>

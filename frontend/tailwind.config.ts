@@ -8,7 +8,11 @@ export default {
     theme: {
         extend: {
             colors: {
-                // flowbite-svelte
+                primaryBg: '#111827', // gray-900
+                secondaryBg: '#1e293b', // gray-800
+                primaryText: '#f3f4f6', // gray-100
+                inputBorderColor: '#374151', // gray-700
+                buttonBg: '#991b1b', // red-800
                 primary: {
                     50: '#FFF5F2',
                     100: '#FFF1EE',

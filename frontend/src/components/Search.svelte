@@ -14,7 +14,7 @@
         type="text"
         placeholder="Search items..."
         on:input={onInput}
-        class="w-full p-2 bg-red-700 border border-gray-700 rounded
-               placeholder-gray-200"
+        class="w-full p-2 bg-red-900 border-gray-600 rounded
+               placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-red-500"
     />
 </div>
