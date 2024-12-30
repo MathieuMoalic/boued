@@ -2,7 +2,7 @@ from typing import Any, Sequence
 
 from sqlmodel import Session, select
 
-from backend.models import Category
+from backend.models import Category, Item
 
 
 def read_categories(session: Session) -> Sequence[Category]:
@@ -42,6 +42,12 @@ def delete_category(session: Session, category_id: int) -> Category:
     category = session.get(Category, category_id)
     if not category:
         raise ValueError("Category not found.")
+    items = session.exec(select(Item).where(Category.id == category_id)).all()
+    if items:
+        for item in items:
+            item.category_id = 1
+            session.add(item)
+            session.commit()
     session.delete(category)
     session.commit()
     return category

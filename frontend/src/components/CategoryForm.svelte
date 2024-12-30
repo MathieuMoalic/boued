@@ -1,6 +1,6 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { api, categories, categoryFormOpen } from "$lib/store";
+    import { api, categories, categoryFormOpen, items } from "$lib/store";
 
     import { Input, Modal } from "flowbite-svelte";
     import {
@@ -38,6 +38,10 @@
     }
 
     async function removeCategory(id: number) {
+        if (id === 1) {
+            addAlert("Cannot delete this category", "error");
+            return;
+        }
         api.categories
             .deleteCategory(id)
             .then((_) => {
@@ -45,6 +49,12 @@
                     cats.filter((cat) => cat.id !== id),
                 );
                 addAlert("Category deleted", "success");
+                // change the category of all the items that had this category to the default category using a for loop
+                for (let i = 0; i < $items.length; i++) {
+                    if ($items[i].category_id === id) {
+                        $items[i].category_id = 1;
+                    }
+                }
             })
             .catch((res) => {
                 addAlert(
