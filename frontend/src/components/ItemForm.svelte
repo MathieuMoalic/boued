@@ -3,6 +3,7 @@
     import { items, itemForm, api, categories } from "$lib/store";
     import { possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input } from "flowbite-svelte";
+    import CategoryForm from "./CategoryForm.svelte";
 
     let textColor = "text-gray-300";
     let backgroundColor = "bg-gray-900";
@@ -177,6 +178,12 @@
                         {category.name}
                     </label>
                 {/each}
+                <label
+                    class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md ${inputBgColor}
+                        text-gray-100 hover:${primaryHoverColor}`}
+                >
+                    <CategoryForm />
+                </label>
             </div>
         </div>
 

@@ -33,3 +33,5 @@ export const itemForm = writable<modalState>({
     }, mode: "add",
     itemID: -1,
 });
+
+export const categoryFormOpen = writable<boolean>(false);

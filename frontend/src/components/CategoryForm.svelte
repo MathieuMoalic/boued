@@ -1,0 +1,93 @@
+<script lang="ts">
+    import { addAlert } from "$lib/alert";
+    import { api, categories, categoryFormOpen } from "$lib/store";
+
+    import { Input, Modal } from "flowbite-svelte";
+    import {
+        CloseOutline,
+        EditOutline,
+        PlusOutline,
+    } from "flowbite-svelte-icons";
+    let textColor = "text-gray-300";
+    let backgroundColor = "bg-gray-800";
+    let inputBgColor = "bg-gray-700";
+    let inputBorderColor = "border-gray-700";
+    // let primaryColor = "bg-primary-600";
+    // let primaryHoverColor = "bg-primary-700";
+    let primaryRingColor = "focus:ring-primary-500";
+    // let dangerColor = "bg-red-600";
+    // let dangerHoverColor = "bg-red-700";
+
+    let inputValue = "";
+    async function addCategory() {
+        if (!inputValue) return;
+
+        api.categories
+            .createCategory({ name: inputValue })
+            .then((res) => {
+                categories.update((cats) => [...cats, res.data]);
+                inputValue = "";
+                addAlert("Category created", "success");
+            })
+            .catch((res) => {
+                addAlert(
+                    res.error.detail || "Failed to create category",
+                    "error",
+                );
+            });
+    }
+
+    async function removeCategory(id: number) {
+        api.categories
+            .deleteCategory(id)
+            .then((_) => {
+                categories.update((cats) =>
+                    cats.filter((cat) => cat.id !== id),
+                );
+                addAlert("Category deleted", "success");
+            })
+            .catch((res) => {
+                addAlert(
+                    res.error.detail || "Failed to delete category",
+                    "error",
+                );
+            });
+    }
+</script>
+
+<button on:click={() => ($categoryFormOpen = true)}>
+    <EditOutline size="md" />
+</button>
+
+<Modal
+    bind:open={$categoryFormOpen}
+    size="xs"
+    outsideclose
+    class={`${backgroundColor} text-gray-100 rounded-lg`}
+>
+    {#each $categories as category}
+        <div class="flex ml-2">
+            <button
+                on:click={() => {
+                    removeCategory(category.id);
+                }}
+            >
+                <CloseOutline color="red" />
+            </button>
+            <div class="ml-3">
+                {category.name}
+            </div>
+        </div>
+    {/each}
+    <div class="flex">
+        <Input
+            placeholder="Add category"
+            bind:value={inputValue}
+            class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
+            on:keydown={(e) => e.key === "Enter" && addCategory()}
+        />
+        <button on:click={addCategory}>
+            <PlusOutline size="md" class="ml-2 self-center" />
+        </button>
+    </div>
+</Modal>

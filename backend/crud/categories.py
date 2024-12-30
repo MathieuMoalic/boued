@@ -11,6 +11,12 @@ def read_categories(session: Session) -> Sequence[Category]:
 
 
 def create_category(session: Session, data: dict[str, Any]) -> Category:
+    # check if category already exists
+    category = session.exec(
+        select(Category).where(Category.name == data["name"])
+    ).first()
+    if category:
+        raise ValueError("Category already exists.")
     category = Category(**data)
     session.add(category)
     session.commit()
