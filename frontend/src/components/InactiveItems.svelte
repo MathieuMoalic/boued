@@ -1,6 +1,6 @@
 <script lang="ts">
     import { items } from "$lib/store";
-    import { List, Heading } from "flowbite-svelte";
+    import { List } from "flowbite-svelte";
     import ItemComp from "$components/Item.svelte";
 </script>
 

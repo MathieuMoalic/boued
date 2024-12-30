@@ -8,10 +8,11 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "fastapi==0.115.6",
-    "rapidfuzz==3.10.1",
     "uvicorn==0.32.1",
     "sqlmodel==0.0.22",
     "websockets==14.1",
+    "pytest==8.3.4",
+    "httpx==0.28.1",
 ]
 
 [build-system]
@@ -22,7 +23,6 @@ build-backend = "setuptools.build_meta"
 exclude = ["htmlcov"]
 
 [tool.pytest.ini_options]
-addopts = "-v -p no:warnings --cov=backend --cov-report=html --doctest-modules "
 testpaths = ["backend/tests"]
 
 [tool.mypy]

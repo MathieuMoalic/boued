@@ -1,27 +1,28 @@
 <script lang="ts">
     import { Dropdown, DropdownItem, Button } from "flowbite-svelte";
 
-    import { ws } from "$lib/store";
-    import { type Item, possibleUnits } from "$lib/types";
+    // import { ws } from "$lib/store";
+    import { possibleUnits } from "$lib/types";
+    import type { ItemRead } from "$lib/Api";
     import { addAlert } from "$lib/alert";
 
-    export let item: Item;
+    export let item: ItemRead;
 
     let editingUnit = false;
 
     async function saveUnit(unit: string) {
         if (unit === item.unit) return;
 
-        try {
-            item.unit = unit;
-            await $ws.updateItem(item.id, { unit });
-        } catch (error) {
-            console.error(
-                `Failed to update unit for item '${item.name}':`,
-                error,
-            );
-            addAlert("Failed to update the unit", "error");
-        }
+        // try {
+        //     item.unit = unit;
+        //     await $ws.updateItem(item.id, { unit });
+        // } catch (error) {
+        //     console.error(
+        //         `Failed to update unit for item '${item.name}':`,
+        //         error,
+        //     );
+        //     addAlert("Failed to update the unit", "error");
+        // }
     }
 </script>
 

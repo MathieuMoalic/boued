@@ -1,5 +1,5 @@
 <script>
-    import { modal } from "$lib/store";
+    import { itemForm } from "$lib/store";
     import { Button } from "flowbite-svelte";
 </script>
 
@@ -7,15 +7,15 @@
     size="lg"
     class="fixed bottom-4 right-4"
     on:click={() => {
-        $modal.mode = "add";
-        $modal.item = {
+        $itemForm.mode = "add";
+        $itemForm.item = {
             name: "",
-            quantity: 0,
+            quantity: null,
             unit: "None",
-            category: "Other",
+            category_id: 1, // Default to "Other"
             notes: "",
         };
-        $modal.isOpen = true;
+        $itemForm.isOpen = true;
     }}
 >
     +

@@ -1,8 +1,8 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { ws } from "$lib/store";
-    import type { Item } from "$lib/types";
-    export let item: Item;
+    // import { ws } from "$lib/store";
+    import type { ItemRead } from "$lib/Api";
+    export let item: ItemRead;
 
     let editing = false;
     let newName = item.name;
@@ -13,18 +13,18 @@
             return;
         }
 
-        try {
-            item.name = newName;
-            await $ws.updateItem(item.id, { name: newName });
-        } catch (error) {
-            console.error(
-                `Failed to update name for item '${item.name}':`,
-                error,
-            );
-            addAlert("Failed to update the name", "error");
-        } finally {
-            editing = false;
-        }
+        // try {
+        //     item.name = newName;
+        //     await $ws.updateItem(item.id, { name: newName });
+        // } catch (error) {
+        //     console.error(
+        //         `Failed to update name for item '${item.name}':`,
+        //         error,
+        //     );
+        //     addAlert("Failed to update the name", "error");
+        // } finally {
+        //     editing = false;
+        // }
     }
 </script>
 

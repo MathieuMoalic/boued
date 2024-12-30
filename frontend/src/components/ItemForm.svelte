@@ -1,7 +1,7 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { ws, items, modal } from "$lib/store";
-    import { possibleCategories, possibleUnits } from "$lib/types";
+    import { items, itemForm, api, categories } from "$lib/store";
+    import { possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input } from "flowbite-svelte";
 
     let textColor = "text-gray-300";
@@ -15,64 +15,80 @@
     let dangerHoverColor = "bg-red-700";
 
     async function submitItem() {
-        if ($modal.mode == "edit") {
-            try {
-                let item = await $ws.updateItem($modal.itemID, $modal.item);
+        if ($itemForm.mode == "edit") {
+            let res = await api.items.update($itemForm.itemID, $itemForm.item);
+            if (!res.ok) {
+                addAlert(
+                    `Failed to update the item '${$itemForm.item.name}':${res.error}`,
+                    "error",
+                );
+                return;
+            } else {
+                let item = res.data;
                 for (let i = 0; i < $items.length; i++) {
                     if ($items[i].id == item.id) {
                         $items[i] = item;
                         break;
                     }
                 }
-                $modal.isOpen = false;
-                $modal.itemID = -1;
+                $itemForm.isOpen = false;
+                $itemForm.itemID = -1;
                 addAlert("Item updated", "success");
-            } catch (error) {
-                console.error(
-                    `Failed to update the item '${$modal.item.name}':`,
-                    error,
-                );
-                addAlert("Failed to update the item", "error");
             }
             return;
-        } else if ($modal.mode == "add") {
-            $modal.mode = "edit";
-            try {
-                let item = await $ws.createItem($modal.item);
-                items.update((items) => [...items, item]);
-                $modal.isOpen = false;
-                addAlert("Item created", "success");
-            } catch (error) {
-                console.error(
-                    `Failed to create the item '${$modal.item.name}':`,
-                    error,
-                );
-                addAlert("Failed to create the item", "error");
+        } else if ($itemForm.mode == "add") {
+            if (!$itemForm.item.name) {
+                addAlert("Name is required", "error");
+                return;
             }
+            if (!$itemForm.item.category_id) {
+                addAlert("Category is required", "error");
+                return;
+            }
+            let res = await api.items.create({
+                name: $itemForm.item.name,
+                notes: $itemForm.item.notes,
+                quantity: $itemForm.item.quantity,
+                unit: $itemForm.item.unit,
+                category_id: $itemForm.item.category_id,
+            });
+            if (!res.ok) {
+                addAlert(
+                    `Failed to update the item '${$itemForm.item.name}':${res.error}`,
+                    "error",
+                );
+                return;
+            } else {
+                items.update((items) => [...items, res.data]);
+                $itemForm.isOpen = false;
+                addAlert("Item created", "success");
+            }
+        } else {
+            addAlert(`Invalid mode: ${$itemForm.mode}`, "error");
         }
     }
 
     async function deleteItem() {
-        try {
-            await $ws.deleteItem($modal.itemID);
+        let res = await api.items.delete($itemForm.itemID);
+        if (!res.ok) {
+            addAlert(
+                `Failed to delete the item '${$itemForm.item.name}':${res.error}`,
+                "error",
+            );
+            return;
+        } else {
             items.update((items) =>
-                items.filter((item) => item.id != $modal.itemID),
+                items.filter((item) => item.id != $itemForm.itemID),
             );
-            $modal.isOpen = false;
-            $modal.itemID = -1;
-            addAlert("Item deleted", "success");
-        } catch (error) {
-            console.error(
-                `Failed to delete the item '${$modal.item.name}':`,
-                error,
-            );
-            addAlert("Failed to delete the item", "error");
+            $itemForm.isOpen = false;
+            $itemForm.itemID = -1;
+            addAlert(`"${$itemForm.item.name}" deleted`, "success");
         }
     }
 </script>
 
 <Modal
-    bind:open={$modal.isOpen}
+    bind:open={$itemForm.isOpen}
     size="xs"
     outsideclose
     class={`${backgroundColor} text-gray-100 rounded-lg`}
@@ -85,7 +101,7 @@
         on:click={(e) => e.stopPropagation()}
     >
         <h3 class="text-lg font-semibold text-gray-100">
-            {#if $modal.mode == "edit"}
+            {#if $itemForm.mode == "edit"}
                 Edit Item
             {:else}
                 Add a New Item
@@ -97,7 +113,7 @@
             <Input
                 type="text"
                 name="name"
-                bind:value={$modal.item.name}
+                bind:value={$itemForm.item.name}
                 class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
                 placeholder="Enter a name"
                 required
@@ -109,7 +125,7 @@
             <Input
                 type="number"
                 name="quantity"
-                bind:value={$modal.item.quantity}
+                bind:value={$itemForm.item.quantity}
                 class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
                 placeholder="Enter quantity"
             />
@@ -121,14 +137,14 @@
                 {#each possibleUnits as choice}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                        ${choice == $modal.item.unit ? primaryColor : inputBgColor}
-                        ${choice == $modal.item.unit ? "text-gray-100" : textColor}
+                        ${choice == $itemForm.item.unit ? primaryColor : inputBgColor}
+                        ${choice == $itemForm.item.unit ? "text-gray-100" : textColor}
                         hover:${primaryHoverColor}`}
                     >
                         <input
                             type="radio"
                             value={choice}
-                            on:click={() => ($modal.item.unit = choice)}
+                            on:click={() => ($itemForm.item.unit = choice)}
                             name="unit"
                             class="hidden"
                         />
@@ -143,21 +159,22 @@
                 >Category</span
             >
             <div class="m-1 grid grid-cols-3 gap-1">
-                {#each possibleCategories as choice}
+                {#each $categories as category}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                        ${choice == $modal.item.category ? primaryColor : inputBgColor}
-                        ${choice == $modal.item.category ? "text-gray-100" : textColor}
+                        ${category.id == $itemForm.item.category_id ? primaryColor : inputBgColor}
+                        ${category.id == $itemForm.item.category_id ? "text-gray-100" : textColor}
                         hover:${primaryHoverColor}`}
                     >
                         <input
                             type="radio"
-                            value={choice}
-                            on:click={() => ($modal.item.category = choice)}
+                            value={category}
+                            on:click={() =>
+                                ($itemForm.item.category_id = category.id)}
                             name="category"
                             class="hidden"
                         />
-                        {choice}
+                        {category.name}
                     </label>
                 {/each}
             </div>
@@ -168,7 +185,7 @@
             <Input
                 type="text"
                 name="notes"
-                bind:value={$modal.item.notes}
+                bind:value={$itemForm.item.notes}
                 class={`${inputBgColor} ${inputBorderColor} rounded-md ${primaryRingColor} ${textColor}`}
                 placeholder="Enter notes"
             />
@@ -179,14 +196,14 @@
             class={`w-full py-2 ${primaryColor} hover:${primaryHoverColor} text-gray-100 font-semibold rounded-md`}
             on:click={submitItem}
         >
-            {#if $modal.mode == "edit"}
+            {#if $itemForm.mode == "edit"}
                 Save
             {:else}
                 Add Item
             {/if}
         </Button>
 
-        {#if $modal.mode == "edit"}
+        {#if $itemForm.mode == "edit"}
             <Button
                 type="button"
                 class={`w-full py-2 ${dangerColor} hover:${dangerHoverColor} text-gray-100 font-semibold rounded-md`}

@@ -1,3 +1,5 @@
+import type { ItemUpdate, ItemCreate, ItemRead } from "$lib/Api";
+
 export interface Item {
     id: number;
     name: string;
@@ -6,6 +8,10 @@ export interface Item {
     notes?: string;
     quantity?: number;
     unit?: string;
+}
+export interface Category {
+    id: number;
+    name: string;
 }
 
 export interface ItemForm {
@@ -27,7 +33,7 @@ export let possibleCategories = ["Other", "Fruit", "Vegetable", "Bread", "Canned
 
 export interface modalState {
     isOpen: boolean;
-    item: ItemForm;
+    item: ItemUpdate | ItemCreate;
     itemID: number;
     mode: "edit" | "add";
 } 

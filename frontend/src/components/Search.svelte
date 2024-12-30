@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { searchTerm, items } from "$lib/store";
+    import { searchTerm } from "$lib/store";
 
     function onInput(e: Event) {
         const target = e.target as HTMLInputElement | null;

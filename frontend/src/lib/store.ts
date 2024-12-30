@@ -1,10 +1,11 @@
-import WebSocketCRUD from '$lib/crud';
 import { writable, derived } from "svelte/store";
 import Fuse from "fuse.js";
 import type { Item, modalState } from "$lib/types";
+import { Api, type CategoryRead, type ItemRead } from "$lib/Api";
 
-export const ws = writable<WebSocketCRUD>(new WebSocketCRUD("/ws"));
-export const items = writable<Item[]>([]);
+export const api = new Api({ baseUrl: "http://localhost:6001" });
+export const items = writable<ItemRead[]>([]);
+export const categories = writable<CategoryRead[]>([]);
 export const searchTerm = writable<string>("");
 
 export const searching = derived(searchTerm, ($searchTerm) => $searchTerm.length > 0);
@@ -24,10 +25,11 @@ export const searchResults = derived(
     }
 );
 
-export const modal = writable<modalState>({
+export const itemForm = writable<modalState>({
     isOpen: false, item: {
         name: "",
-        category: "Other",
+        category_id: 0,
+        quantity: null,
     }, mode: "add",
     itemID: -1,
 });

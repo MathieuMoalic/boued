@@ -1,30 +1,29 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { ws } from "$lib/store";
-    import type { Item } from "$lib/types";
-    export let item: Item;
+    // import { ws } from "$lib/store";
+    import type { ItemRead } from "$lib/Api";
+    export let item: ItemRead;
 
     let editing = false;
     let newQuantity = item.quantity;
 
     async function saveQuantity() {
-        if (newQuantity === item.quantity) {
-            editing = false;
-            return;
-        }
-
-        try {
-            item.quantity = newQuantity;
-            await $ws.updateItem(item.id, { quantity: newQuantity });
-        } catch (error) {
-            console.error(
-                `Failed to update quantity for item '${item.name}':`,
-                error,
-            );
-            addAlert("Failed to update the quantity", "error");
-        } finally {
-            editing = false;
-        }
+        // if (newQuantity === item.quantity) {
+        //     editing = false;
+        //     return;
+        // }
+        // try {
+        //     item.quantity = newQuantity;
+        //     await $ws.updateItem(item.id, { quantity: newQuantity });
+        // } catch (error) {
+        //     console.error(
+        //         `Failed to update quantity for item '${item.name}':`,
+        //         error,
+        //     );
+        //     addAlert("Failed to update the quantity", "error");
+        // } finally {
+        //     editing = false;
+        // }
     }
 </script>
 

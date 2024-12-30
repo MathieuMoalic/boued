@@ -1,8 +1,8 @@
 <script lang="ts">
-    import type { Item } from "$lib/types";
+    import type { ItemRead } from "$lib/Api";
     import { Modal } from "flowbite-svelte";
     let clickOutsideModal = false;
-    export let item: Item;
+    export let item: ItemRead;
 </script>
 
 {#if item.notes !== ""}

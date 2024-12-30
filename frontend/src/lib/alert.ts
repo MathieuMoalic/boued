@@ -18,6 +18,7 @@ export function addAlert(message: string, type: "success" | "error") {
         color = "bg-green-400";
     } else {
         color = "bg-red-400";
+        console.error(message);
     }
     alerts.update((currentAlerts) => [
         ...currentAlerts,
