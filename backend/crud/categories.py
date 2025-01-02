@@ -25,12 +25,21 @@ def create_category(session: Session, data: dict[str, Any]) -> Category:
 
 
 def update_category(
-    session: Session, category_id: int, update_data: dict[str, Any]
+    session: Session, category_id: int, data: dict[str, Any]
 ) -> Category:
+    # check if a category already has the same name
+    category = session.exec(
+        select(Category).where(Category.name == data["name"])
+    ).first()
+    if category:
+        raise ValueError("Category with the same name already exists.")
+
+    # check if the category we want to modify exists
     category = session.get(Category, category_id)
     if not category:
         raise ValueError("Category not found.")
-    for key, value in update_data.items():
+
+    for key, value in data.items():
         setattr(category, key, value)
     session.add(category)
     session.commit()

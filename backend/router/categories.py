@@ -1,6 +1,6 @@
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlmodel import Session
 
 from backend.crud.categories import (
@@ -22,13 +22,8 @@ def create_category_endpoint(
     """
     Create a new category.
     """
-    try:
-        category = create_category(session, category_data.model_dump())
-        return category
-    except HTTPException as e:
-        raise e
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+    category = create_category(session, category_data.model_dump())
+    return category
 
 
 @router.get("", response_model=List[CategoryRead], operation_id="readAllCategory")
@@ -40,7 +35,9 @@ def read_categories_endpoint(session: Session = Depends(get_session)):
     return categories
 
 
-@router.put("/{category_id}", response_model=CategoryRead, operation_id="readCategory")
+@router.put(
+    "/{category_id}", response_model=CategoryRead, operation_id="updateCategory"
+)
 def update_category_endpoint(
     category_id: int,
     update_data: CategoryUpdate,

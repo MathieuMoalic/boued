@@ -4,10 +4,38 @@
 
     import { Input, Modal } from "flowbite-svelte";
     import {
+        BanOutline,
+        CheckOutline,
         CloseOutline,
         EditOutline,
         PlusOutline,
     } from "flowbite-svelte-icons";
+
+    let editCategory = "";
+    let editCategoryInput = "";
+    async function editCategoryName(id: number) {
+        if (!editCategoryInput) return;
+
+        api.categories
+            .updateCategory(id, { name: editCategoryInput })
+            .then((res) => {
+                categories.update((cats) =>
+                    cats.map((cat) =>
+                        cat.id === id ? { ...cat, name: res.data.name } : cat,
+                    ),
+                );
+                editCategory = "";
+                editCategoryInput = "";
+                addAlert("Category edited", "success");
+            })
+            .catch((res) => {
+                console.log(res);
+                addAlert(
+                    res.error.detail || "Failed to edit category",
+                    "error",
+                );
+            });
+    }
 
     let inputValue = "";
     async function addCategory() {
@@ -18,6 +46,8 @@
             .then((res) => {
                 categories.update((cats) => [...cats, res.data]);
                 inputValue = "";
+                console.log(res.data);
+                console.log($categories);
                 addAlert("Category created", "success");
             })
             .catch((res) => {
@@ -67,24 +97,63 @@
     class="bg-secondaryBg text-gray-100 rounded-lg"
 >
     {#each $categories as category}
-        <div class="flex ml-2">
-            <button
-                on:click={() => {
-                    removeCategory(category.id);
-                }}
-            >
-                <CloseOutline color="red" />
-            </button>
-            <div class="ml-3">
-                {category.name}
+        {#if editCategory !== category.name}
+            <div class="flex ml-2 bg-primaryBg rounded mr-12 p-2">
+                <button
+                    on:click={() => {
+                        removeCategory(category.id);
+                    }}
+                >
+                    <CloseOutline color="red" />
+                </button>
+                <div class="ml-3">
+                    {category.name}
+                </div>
+                <div class="ml-auto">
+                    <button
+                        on:click={() => {
+                            editCategory = category.name;
+                            editCategoryInput = category.name;
+                        }}
+                    >
+                        <EditOutline size="md" color="orange" />
+                    </button>
+                </div>
             </div>
-        </div>
+        {:else}
+            <div class="flex ml-2 bg-primaryBg rounded mr-12 p-2">
+                <input
+                    type="text"
+                    class="bg-primaryBg border-inputBorderColor rounded-md primaryText w-full h-7"
+                    bind:value={editCategoryInput}
+                    on:keydown={(e) =>
+                        e.key === "Enter" && editCategoryName(category.id)}
+                />
+                <button
+                    class="w-2/12 flex justify-center items-center"
+                    on:click={() => {
+                        editCategory = "";
+                        editCategoryInput = "";
+                    }}
+                >
+                    <BanOutline color="red" />
+                </button>
+                <button
+                    class="w-2/12 flex justify-center items-center"
+                    on:click={() => {
+                        editCategoryName(category.id);
+                    }}
+                >
+                    <CheckOutline color="green" />
+                </button>
+            </div>
+        {/if}
     {/each}
     <div class="flex">
         <Input
             placeholder="Add category"
             bind:value={inputValue}
-            class="bg-primaryBg border-inputBorderColor rounded-md primaryText`"
+            class="bg-primaryBg border-inputBorderColor rounded-md text-primaryText`"
             on:keydown={(e) => e.key === "Enter" && addCategory()}
         />
         <button on:click={addCategory}>

@@ -450,11 +450,11 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Update an existing category by ID.
      *
      * @tags categories
-     * @name ReadCategory
+     * @name UpdateCategory
      * @summary Update Category Endpoint
      * @request PUT:/categories/{category_id}
      */
-    readCategory: (categoryId: number, data: CategoryUpdate, params: RequestParams = {}) =>
+    updateCategory: (categoryId: number, data: CategoryUpdate, params: RequestParams = {}) =>
       this.request<CategoryRead, HTTPValidationError>({
         path: `/categories/${categoryId}`,
         method: "PUT",
