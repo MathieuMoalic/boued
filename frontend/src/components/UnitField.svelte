@@ -4,7 +4,7 @@
     import { possibleUnits } from "$lib/types";
     import type { ItemRead } from "$lib/Api";
     import { addAlert } from "$lib/alert";
-    import { api } from "$lib/store";
+    import { api } from "$lib/auth";
 
     export let item: ItemRead;
 
@@ -12,8 +12,7 @@
 
     async function saveUnit(unit: string) {
         if (unit === item.unit) return;
-        api.items
-            .update(item.id, { unit })
+        api.itemUpdate(item.id, { unit })
             .then((_) => {
                 item.unit = unit;
                 addAlert("Unit updated", "success");

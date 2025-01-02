@@ -4,41 +4,51 @@
 	import Search from "$components/Search.svelte";
 	import SearchResult from "$components/SearchResult.svelte";
 	import ItemForm from "$components/ItemForm.svelte";
-	import { items, searching, api, categories } from "$lib/store";
+	import { items, searching, categories, authenticated } from "$lib/store";
+	import { api, get_password, login } from "$lib/auth";
 	import { onMount } from "svelte";
 	import AddItemButton from "$components/AddItemButton.svelte";
 	import Alert from "$components/Alert.svelte";
 	import { addAlert } from "$lib/alert";
-	let isReady = false;
+	import Login from "$components/Login.svelte";
 	onMount(async () => {
-		let res = await api.items.readAll();
-		if (!res.ok) {
-			addAlert("Failed to fetch items: " + res.error, "error");
-			return;
-		} else {
-			items.set(res.data);
+		// The initial fetch of items and categories is done
+		// in Login if the user is not authenticated.
+		if (!$authenticated) {
+			let password = get_password();
+			if (password) {
+				login();
+			}
 		}
-		let res2 = await api.categories.readAllCategory();
-		if (!res2.ok) {
-			addAlert("Failed to fetch categories: " + res2.error, "error");
-			return;
-		} else {
-			categories.set(res2.data);
-		}
-		isReady = true;
+		api.itemReadAll()
+			.then((res) => {
+				items.set(res.data);
+			})
+			.catch((res) => {
+				addAlert("Failed to fetch items: " + res.error, "error");
+			});
+		api.categoryreadAll()
+			.then((res) => {
+				categories.set(res.data);
+			})
+			.catch((res) => {
+				addAlert("Failed to fetch categories: " + res.error, "error");
+			});
 	});
 </script>
 
-<Search />
-{#if !isReady}
-	<p>Loading...</p>
-{:else if $searching}
-	<SearchResult />
+{#if $authenticated}
+	<Search />
+	{#if $searching}
+		<SearchResult />
+	{:else}
+		<ActiveItems />
+		<hr class="m-4" />
+		<InactiveItems />
+	{/if}
+	<ItemForm />
+	<AddItemButton />
 {:else}
-	<ActiveItems />
-	<hr class="m-4" />
-	<InactiveItems />
+	<Login />
 {/if}
-<ItemForm />
-<AddItemButton />
 <Alert />

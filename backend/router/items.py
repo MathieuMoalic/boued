@@ -16,11 +16,14 @@ from backend.schemas.items import (
     ItemRead,
     ItemUpdate,
 )
+from backend.security import verify_password
 
-router = APIRouter(prefix="/items", tags=["items"])
+router = APIRouter(
+    prefix="/api/items", tags=["items"], dependencies=[Depends(verify_password)]
+)
 
 
-@router.post("", response_model=ItemRead, operation_id="create")
+@router.post("", response_model=ItemRead, operation_id="itemCreate")
 def create_item_endpoint(
     item_data: ItemCreate, session: Session = Depends(get_session)
 ):
@@ -31,7 +34,7 @@ def create_item_endpoint(
     return item
 
 
-@router.get("", response_model=List[ItemRead], operation_id="readAll")
+@router.get("", response_model=List[ItemRead], operation_id="itemReadAll")
 def read_items_endpoint(session: Session = Depends(get_session)):
     """
     Read all items.
@@ -40,7 +43,7 @@ def read_items_endpoint(session: Session = Depends(get_session)):
     return items
 
 
-@router.get("/{item_id}", response_model=ItemRead, operation_id="read")
+@router.get("/{item_id}", response_model=ItemRead, operation_id="itemRead")
 def read_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     """
     Read a single item by ID.
@@ -49,7 +52,7 @@ def read_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     return item
 
 
-@router.put("/{item_id}", response_model=ItemRead, operation_id="update")
+@router.put("/{item_id}", response_model=ItemRead, operation_id="itemUpdate")
 def update_item_endpoint(
     item_id: int, update_data: ItemUpdate, session: Session = Depends(get_session)
 ):
@@ -60,7 +63,7 @@ def update_item_endpoint(
     return item
 
 
-@router.delete("/{item_id}", response_model=ItemRead, operation_id="delete")
+@router.delete("/{item_id}", response_model=ItemRead, operation_id="itemDelete")
 def delete_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     """
     Delete an item by ID.

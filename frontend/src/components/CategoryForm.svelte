@@ -1,6 +1,7 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { api, categories, categoryFormOpen, items } from "$lib/store";
+    import { api } from "$lib/auth";
+    import { categories, categoryFormOpen, items } from "$lib/store";
 
     import { Input, Modal } from "flowbite-svelte";
     import {
@@ -16,8 +17,7 @@
     async function editCategoryName(id: number) {
         if (!editCategoryInput) return;
 
-        api.categories
-            .updateCategory(id, { name: editCategoryInput })
+        api.categoryUpdate(id, { name: editCategoryInput })
             .then((res) => {
                 categories.update((cats) =>
                     cats.map((cat) =>
@@ -41,8 +41,7 @@
     async function addCategory() {
         if (!inputValue) return;
 
-        api.categories
-            .createCategory({ name: inputValue })
+        api.categoryCreate({ name: inputValue })
             .then((res) => {
                 categories.update((cats) => [...cats, res.data]);
                 inputValue = "";
@@ -63,8 +62,7 @@
             addAlert("Cannot delete this category", "error");
             return;
         }
-        api.categories
-            .deleteCategory(id)
+        api.categoryDelete(id)
             .then((_) => {
                 categories.update((cats) =>
                     cats.filter((cat) => cat.id !== id),

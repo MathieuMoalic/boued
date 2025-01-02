@@ -1,15 +1,14 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
     import type { ItemRead } from "$lib/Api";
-    import { api } from "$lib/store";
+    import { api } from "$lib/auth";
     export let item: ItemRead;
 
     let editing = false;
     let newQuantity = item.quantity;
 
     async function saveQuantity() {
-        api.items
-            .update(item.id, { quantity: newQuantity })
+        api.itemUpdate(item.id, { quantity: newQuantity })
             .then((_) => {
                 item.quantity = newQuantity;
                 addAlert("Quantity updated", "success");

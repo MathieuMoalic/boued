@@ -1,13 +1,14 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { api, items } from "$lib/store";
+    import { items } from "$lib/store";
+
     import type { ItemRead } from "$lib/Api";
     import { CloseOutline, PlusOutline } from "flowbite-svelte-icons";
+    import { api } from "$lib/auth";
     export let item: ItemRead;
 
     async function toggleActive() {
-        api.items
-            .update(item.id, { is_active: !item.is_active })
+        api.itemUpdate(item.id, { is_active: !item.is_active })
             .then((_) => {
                 item.is_active = !item.is_active;
                 for (let i = 0; i < $items.length; i++) {

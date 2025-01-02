@@ -1,13 +1,14 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { items, itemForm, api, categories } from "$lib/store";
+    import { items, itemForm, categories } from "$lib/store";
     import { possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input } from "flowbite-svelte";
     import CategoryForm from "./CategoryForm.svelte";
+    import { api } from "$lib/auth";
 
     async function submitItem() {
         if ($itemForm.mode == "edit") {
-            let res = await api.items.update($itemForm.itemID, $itemForm.item);
+            let res = await api.itemUpdate($itemForm.itemID, $itemForm.item);
             if (!res.ok) {
                 addAlert(
                     `Failed to update the item '${$itemForm.item.name}':${res.error}`,
@@ -36,7 +37,7 @@
                 addAlert("Category is required", "error");
                 return;
             }
-            let res = await api.items.create({
+            let res = await api.itemCreate({
                 name: $itemForm.item.name,
                 notes: $itemForm.item.notes,
                 quantity: $itemForm.item.quantity,
@@ -60,7 +61,7 @@
     }
 
     async function deleteItem() {
-        let res = await api.items.delete($itemForm.itemID);
+        let res = await api.itemDelete($itemForm.itemID);
         if (!res.ok) {
             addAlert(
                 `Failed to delete the item '${$itemForm.item.name}':${res.error}`,

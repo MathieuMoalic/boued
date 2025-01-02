@@ -1,9 +1,9 @@
 import { writable, derived } from "svelte/store";
 import Fuse from "fuse.js";
-import type { Item, modalState } from "$lib/types";
-import { Api, type CategoryRead, type ItemRead } from "$lib/Api";
+import type { modalState } from "$lib/types";
+import { type CategoryRead, type ItemRead } from "$lib/Api";
 
-export const api = new Api({ baseUrl: "http://localhost:6001" });
+export const authenticated = writable<boolean>(false);
 export const items = writable<ItemRead[]>([]);
 export const categories = writable<CategoryRead[]>([]);
 export const searchTerm = writable<string>("");

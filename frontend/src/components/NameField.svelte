@@ -1,7 +1,7 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
     import type { ItemRead } from "$lib/Api";
-    import { api } from "$lib/store";
+    import { api } from "$lib/auth";
     export let item: ItemRead;
 
     let editing = false;
@@ -12,8 +12,7 @@
             editing = false;
             return;
         }
-        api.items
-            .update(item.id, { name: newName })
+        api.itemUpdate(item.id, { name: newName })
             .then((_) => {
                 item.name = newName;
                 addAlert("Name updated", "success");

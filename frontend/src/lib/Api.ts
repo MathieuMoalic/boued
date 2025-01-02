@@ -326,19 +326,21 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version 0.1.0
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
-  items = {
+  api = {
     /**
      * @description Read all items.
      *
      * @tags items
-     * @name ReadAll
+     * @name ItemReadAll
      * @summary Read Items Endpoint
-     * @request GET:/items
+     * @request GET:/api/items
+     * @secure
      */
-    readAll: (params: RequestParams = {}) =>
+    itemReadAll: (params: RequestParams = {}) =>
       this.request<ItemRead[], any>({
-        path: `/items`,
+        path: `/api/items`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -347,15 +349,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Create a new item.
      *
      * @tags items
-     * @name Create
+     * @name ItemCreate
      * @summary Create Item Endpoint
-     * @request POST:/items
+     * @request POST:/api/items
+     * @secure
      */
-    create: (data: ItemCreate, params: RequestParams = {}) =>
+    itemCreate: (data: ItemCreate, params: RequestParams = {}) =>
       this.request<ItemRead, HTTPValidationError>({
-        path: `/items`,
+        path: `/api/items`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -365,14 +369,16 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Read a single item by ID.
      *
      * @tags items
-     * @name Read
+     * @name ItemRead
      * @summary Read Item Endpoint
-     * @request GET:/items/{item_id}
+     * @request GET:/api/items/{item_id}
+     * @secure
      */
-    read: (itemId: number, params: RequestParams = {}) =>
+    itemRead: (itemId: number, params: RequestParams = {}) =>
       this.request<ItemRead, HTTPValidationError>({
-        path: `/items/${itemId}`,
+        path: `/api/items/${itemId}`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -381,15 +387,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Update an existing item by ID.
      *
      * @tags items
-     * @name Update
+     * @name ItemUpdate
      * @summary Update Item Endpoint
-     * @request PUT:/items/{item_id}
+     * @request PUT:/api/items/{item_id}
+     * @secure
      */
-    update: (itemId: number, data: ItemUpdate, params: RequestParams = {}) =>
+    itemUpdate: (itemId: number, data: ItemUpdate, params: RequestParams = {}) =>
       this.request<ItemRead, HTTPValidationError>({
-        path: `/items/${itemId}`,
+        path: `/api/items/${itemId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -399,31 +407,34 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Delete an item by ID.
      *
      * @tags items
-     * @name Delete
+     * @name ItemDelete
      * @summary Delete Item Endpoint
-     * @request DELETE:/items/{item_id}
+     * @request DELETE:/api/items/{item_id}
+     * @secure
      */
-    delete: (itemId: number, params: RequestParams = {}) =>
+    itemDelete: (itemId: number, params: RequestParams = {}) =>
       this.request<ItemRead, HTTPValidationError>({
-        path: `/items/${itemId}`,
+        path: `/api/items/${itemId}`,
         method: "DELETE",
+        secure: true,
         format: "json",
         ...params,
       }),
-  };
-  categories = {
+
     /**
      * @description Read all categories.
      *
      * @tags categories
-     * @name ReadAllCategory
+     * @name CategoryreadAll
      * @summary Read Categories Endpoint
-     * @request GET:/categories
+     * @request GET:/api/categories
+     * @secure
      */
-    readAllCategory: (params: RequestParams = {}) =>
+    categoryreadAll: (params: RequestParams = {}) =>
       this.request<CategoryRead[], any>({
-        path: `/categories`,
+        path: `/api/categories`,
         method: "GET",
+        secure: true,
         format: "json",
         ...params,
       }),
@@ -432,15 +443,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Create a new category.
      *
      * @tags categories
-     * @name CreateCategory
+     * @name CategoryCreate
      * @summary Create Category Endpoint
-     * @request POST:/categories
+     * @request POST:/api/categories
+     * @secure
      */
-    createCategory: (data: CategoryCreate, params: RequestParams = {}) =>
+    categoryCreate: (data: CategoryCreate, params: RequestParams = {}) =>
       this.request<CategoryRead, HTTPValidationError>({
-        path: `/categories`,
+        path: `/api/categories`,
         method: "POST",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -450,15 +463,17 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Update an existing category by ID.
      *
      * @tags categories
-     * @name UpdateCategory
+     * @name CategoryUpdate
      * @summary Update Category Endpoint
-     * @request PUT:/categories/{category_id}
+     * @request PUT:/api/categories/{category_id}
+     * @secure
      */
-    updateCategory: (categoryId: number, data: CategoryUpdate, params: RequestParams = {}) =>
+    categoryUpdate: (categoryId: number, data: CategoryUpdate, params: RequestParams = {}) =>
       this.request<CategoryRead, HTTPValidationError>({
-        path: `/categories/${categoryId}`,
+        path: `/api/categories/${categoryId}`,
         method: "PUT",
         body: data,
+        secure: true,
         type: ContentType.Json,
         format: "json",
         ...params,
@@ -468,14 +483,32 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @description Delete an category by ID.
      *
      * @tags categories
-     * @name DeleteCategory
+     * @name CategoryDelete
      * @summary Delete Category Endpoint
-     * @request DELETE:/categories/{category_id}
+     * @request DELETE:/api/categories/{category_id}
+     * @secure
      */
-    deleteCategory: (categoryId: number, params: RequestParams = {}) =>
+    categoryDelete: (categoryId: number, params: RequestParams = {}) =>
       this.request<CategoryRead, HTTPValidationError>({
-        path: `/categories/${categoryId}`,
+        path: `/api/categories/${categoryId}`,
         method: "DELETE",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+  };
+  ping = {
+    /**
+     * No description
+     *
+     * @name PongPingGet
+     * @summary Pong
+     * @request GET:/ping
+     */
+    pongPingGet: (params: RequestParams = {}) =>
+      this.request<any, any>({
+        path: `/ping`,
+        method: "GET",
         format: "json",
         ...params,
       }),

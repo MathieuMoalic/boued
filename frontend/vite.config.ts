@@ -5,10 +5,18 @@ export default defineConfig({
 	plugins: [sveltekit()],
 	server: {
 		proxy: {
-			'/ws': {
-				target: 'ws://localhost:6001',
-				ws: true
+			'/api': {
+				target: 'http://localhost:6001',
+				changeOrigin: true,
 			},
+			'/ping': {
+				target: 'http://localhost:6001',
+				changeOrigin: true,
+			},
+			// '/ws': {
+			// 	target: 'ws://localhost:6001',
+			// 	ws: true
+			// },
 		}
 	}
 });

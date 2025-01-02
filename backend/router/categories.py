@@ -11,11 +11,16 @@ from backend.crud.categories import (
 )
 from backend.database import get_session
 from backend.schemas.categories import CategoryCreate, CategoryRead, CategoryUpdate
+from backend.security import verify_password
 
-router = APIRouter(prefix="/categories", tags=["categories"])
+router = APIRouter(
+    prefix="/api/categories",
+    tags=["categories"],
+    dependencies=[Depends(verify_password)],
+)
 
 
-@router.post("", response_model=CategoryRead, operation_id="createCategory")
+@router.post("", response_model=CategoryRead, operation_id="categoryCreate")
 def create_category_endpoint(
     category_data: CategoryCreate, session: Session = Depends(get_session)
 ):
@@ -26,7 +31,7 @@ def create_category_endpoint(
     return category
 
 
-@router.get("", response_model=List[CategoryRead], operation_id="readAllCategory")
+@router.get("", response_model=List[CategoryRead], operation_id="categoryreadAll")
 def read_categories_endpoint(session: Session = Depends(get_session)):
     """
     Read all categories.
@@ -36,7 +41,7 @@ def read_categories_endpoint(session: Session = Depends(get_session)):
 
 
 @router.put(
-    "/{category_id}", response_model=CategoryRead, operation_id="updateCategory"
+    "/{category_id}", response_model=CategoryRead, operation_id="categoryUpdate"
 )
 def update_category_endpoint(
     category_id: int,
@@ -53,7 +58,7 @@ def update_category_endpoint(
 
 
 @router.delete(
-    "/{category_id}", response_model=CategoryRead, operation_id="deleteCategory"
+    "/{category_id}", response_model=CategoryRead, operation_id="categoryDelete"
 )
 def delete_category_endpoint(category_id: int, session: Session = Depends(get_session)):
     """
