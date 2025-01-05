@@ -3,9 +3,12 @@
     import { Modal } from "flowbite-svelte";
     let clickOutsideModal = false;
     export let item: ItemRead;
+    console.log(item.notes);
+    console.log(item.notes !== null);
+    console.log(item.notes !== "");
 </script>
 
-{#if item.notes !== ""}
+{#if item.notes !== "" && item.notes !== null}
     <div class="flex items-center pl-2 overflow-hidden">
         <button
             on:click={() => (clickOutsideModal = true)}

@@ -15,10 +15,6 @@ logger = logging.getLogger("database")
 app = FastAPI()
 
 
-# Mount static files
-app.mount("/static", StaticFiles(directory="./static"), name="static")
-
-# Include routes
 app.include_router(items_router)
 app.include_router(categories_router)
 
@@ -26,6 +22,9 @@ app.include_router(categories_router)
 @app.get("/ping", dependencies=[Depends(verify_password)])
 async def pong():
     return {"ping": "pong!"}
+
+
+app.mount("/", StaticFiles(directory="static", html=True), name="static")
 
 
 # handle all ValueErrors

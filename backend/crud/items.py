@@ -20,6 +20,7 @@ def create_item(session: Session, data: dict[str, Any]) -> Item:
 
     # Create and add the item
     item = Item(**data)
+    print(item)
     item.is_active = True
     session.add(item)
     session.commit()
