@@ -9,6 +9,25 @@
  * ---------------------------------------------------------------
  */
 
+/** Body_login_token_post */
+export interface BodyLoginTokenPost {
+  /** Grant Type */
+  grant_type?: string | null;
+  /** Username */
+  username: string;
+  /** Password */
+  password: string;
+  /**
+   * Scope
+   * @default ""
+   */
+  scope?: string;
+  /** Client Id */
+  client_id?: string | null;
+  /** Client Secret */
+  client_secret?: string | null;
+}
+
 /**
  * CategoryCreate
  * Schema for creating a new Category.
@@ -497,18 +516,20 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         ...params,
       }),
   };
-  ping = {
+  token = {
     /**
      * No description
      *
-     * @name PongPingGet
-     * @summary Pong
-     * @request GET:/ping
+     * @name LoginTokenPost
+     * @summary Login
+     * @request POST:/token
      */
-    pongPingGet: (params: RequestParams = {}) =>
-      this.request<any, any>({
-        path: `/ping`,
-        method: "GET",
+    loginTokenPost: (data: BodyLoginTokenPost, params: RequestParams = {}) =>
+      this.request<any, HTTPValidationError>({
+        path: `/token`,
+        method: "POST",
+        body: data,
+        type: ContentType.UrlEncoded,
         format: "json",
         ...params,
       }),

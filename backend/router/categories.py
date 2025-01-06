@@ -10,13 +10,13 @@ from backend.crud.categories import (
     update_category,
 )
 from backend.database import get_session
+from backend.jwt import get_current_user
 from backend.schemas.categories import CategoryCreate, CategoryRead, CategoryUpdate
-from backend.security import verify_password
 
 router = APIRouter(
     prefix="/api/categories",
     tags=["categories"],
-    dependencies=[Depends(verify_password)],
+    dependencies=[Depends(get_current_user)],
 )
 
 

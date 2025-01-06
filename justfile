@@ -19,3 +19,9 @@ caddy:
         -p 80:80 \
         -p 443:443 \
         caddy:latest
+
+backend:
+    DATABASE_URL=sqlite:///./test.db \
+    ADMIN_USERNAME=${ADMIN_USERNAME} \
+    ADMIN_PASSWORD=${ADMIN_PASSWORD} \
+    uvicorn backend.main:app --proxy-headers --host 0.0.0.0 --port 6001 --reload

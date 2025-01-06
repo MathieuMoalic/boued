@@ -13,6 +13,10 @@ export default defineConfig({
 				target: 'http://localhost:6001',
 				changeOrigin: true,
 			},
+			'/token': {
+				target: 'http://localhost:6001',
+				changeOrigin: true,
+			},
 			// '/ws': {
 			// 	target: 'ws://localhost:6001',
 			// 	ws: true

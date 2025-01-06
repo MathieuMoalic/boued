@@ -4,22 +4,15 @@
 	import Search from "$components/Search.svelte";
 	import SearchResult from "$components/SearchResult.svelte";
 	import ItemForm from "$components/ItemForm.svelte";
-	import { items, searching, categories, authenticated } from "$lib/store";
-	import { api, get_password, login } from "$lib/auth";
+	import { items, searching, categories } from "$lib/store";
+	import { apiInner, api } from "$lib/auth";
 	import { onMount } from "svelte";
 	import AddItemButton from "$components/AddItemButton.svelte";
 	import Alert from "$components/Alert.svelte";
 	import { addAlert } from "$lib/alert";
-	import Login from "$components/Login.svelte";
-	onMount(async () => {
-		// The initial fetch of items and categories is done
-		// in Login if the user is not authenticated.
-		if (!$authenticated) {
-			let password = get_password();
-			if (password) {
-				login();
-			}
-		}
+	import { goto } from "$app/navigation";
+
+	async function fetchData() {
 		api.itemReadAll()
 			.then((res) => {
 				items.set(res.data);
@@ -34,21 +27,26 @@
 			.catch((res) => {
 				addAlert("Failed to fetch categories: " + res.error, "error");
 			});
+	}
+	onMount(async () => {
+		const token = localStorage.getItem("token");
+		if (!token) {
+			goto("/login");
+		} else {
+			apiInner.setSecurityData({ accessToken: token });
+		}
+		await fetchData();
 	});
 </script>
 
-{#if $authenticated}
-	<Search />
-	{#if $searching}
-		<SearchResult />
-	{:else}
-		<ActiveItems />
-		<hr class="m-4" />
-		<InactiveItems />
-	{/if}
-	<ItemForm />
-	<AddItemButton />
+<Search />
+{#if $searching}
+	<SearchResult />
 {:else}
-	<Login />
+	<ActiveItems />
+	<hr class="m-4" />
+	<InactiveItems />
 {/if}
+<ItemForm />
+<AddItemButton />
 <Alert />
