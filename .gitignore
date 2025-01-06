@@ -16,3 +16,4 @@ backend/static
 frontend_old
 .svelte-kit
 /data
+/Caddyfile

@@ -51,7 +51,6 @@ export function login() {
     // Test the credentials
     apiInner.ping.pongPingGet().then((res) => {
         localStorage.setItem("password", password)
-        addAlert("Authentificated", "success");
         authenticated.set(true);
     }).catch((res) => {
         addAlert(res.error, "error",);
