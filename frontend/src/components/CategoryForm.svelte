@@ -29,7 +29,6 @@
                 addAlert("Category edited", "success");
             })
             .catch((res) => {
-                console.log(res);
                 addAlert(
                     res.error.detail || "Failed to edit category",
                     "error",
@@ -45,8 +44,6 @@
             .then((res) => {
                 categories.update((cats) => [...cats, res.data]);
                 inputValue = "";
-                console.log(res.data);
-                console.log($categories);
                 addAlert("Category created", "success");
             })
             .catch((res) => {
