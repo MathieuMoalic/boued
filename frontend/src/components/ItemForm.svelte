@@ -2,18 +2,21 @@
     import { addAlert } from "$lib/alert";
     import { items, itemForm, categories } from "$lib/store";
     import { possibleUnits } from "$lib/types";
-    import { Button, Modal, Label, Input } from "flowbite-svelte";
+    import { Button, Modal, Label, Input, Spinner } from "flowbite-svelte";
     import CategoryForm from "./CategoryForm.svelte";
     import { api } from "$lib/auth";
 
+    let loading = false;
     async function submitItem() {
         if ($itemForm.mode == "edit") {
+            loading = true;
             let res = await api.itemUpdate($itemForm.itemID, $itemForm.item);
             if (!res.ok) {
                 addAlert(
                     `Failed to update the item '${$itemForm.item.name}':${res.error}`,
                     "error",
                 );
+                loading = false;
                 return;
             } else {
                 let item = res.data;
@@ -27,6 +30,7 @@
                 $itemForm.itemID = -1;
                 addAlert("Item updated", "success");
             }
+            loading = false;
             return;
         } else if ($itemForm.mode == "add") {
             if (!$itemForm.item.name) {
@@ -37,6 +41,7 @@
                 addAlert("Category is required", "error");
                 return;
             }
+            loading = true;
             let res = await api.itemCreate({
                 name: $itemForm.item.name,
                 notes: $itemForm.item.notes,
@@ -49,6 +54,7 @@
                     `Failed to update the item '${$itemForm.item.name}':${res.error}`,
                     "error",
                 );
+                loading = false;
                 return;
             } else {
                 items.update((items) => [...items, res.data]);
@@ -58,6 +64,7 @@
         } else {
             addAlert(`Invalid mode: ${$itemForm.mode}`, "error");
         }
+        loading = false;
     }
 
     async function deleteItem() {
@@ -194,7 +201,9 @@
             class="w-full py-2 bg-buttonBg text-primaryText font-semibold rounded-md"
             on:click={submitItem}
         >
-            {#if $itemForm.mode == "edit"}
+            {#if loading}
+                <Spinner class="h-6" />
+            {:else if $itemForm.mode == "edit"}
                 Save
             {:else}
                 Add Item
