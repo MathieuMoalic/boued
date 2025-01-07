@@ -13,7 +13,7 @@ class Item(SQLModel, table=True):
     name: str = Field(index=True, unique=True)
     is_active: bool = Field(default=False, index=True)
     notes: Optional[str] = Field(default=None)
-    quantity: Optional[int] = Field(default=None)
+    quantity: Optional[float] = Field(default=None)
     unit: Optional[str] = Field(default=None)
     category_id: int = Field(default=None)
 

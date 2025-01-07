@@ -11,7 +11,7 @@ class ItemCreate(BaseModel):
     name: str
     category_id: int
     notes: Optional[str] = None
-    quantity: Optional[int] = None
+    quantity: Optional[float] = None
     unit: Optional[str] = None
 
 
@@ -24,7 +24,7 @@ class ItemUpdate(BaseModel):
     category_id: Optional[int] = None
     is_active: Optional[bool] = None
     notes: Optional[str] = None
-    quantity: Optional[int] = None
+    quantity: Optional[float] = None
     unit: Optional[str] = None
 
 
@@ -38,5 +38,5 @@ class ItemRead(BaseModel):
     category_id: int
     is_active: bool
     notes: Optional[str]
-    quantity: Optional[int]
+    quantity: Optional[float]
     unit: Optional[str]
