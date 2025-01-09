@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 from fastapi import Depends, FastAPI, Request
@@ -17,14 +18,13 @@ logger = logging.getLogger("database")
 app = FastAPI()
 
 
+@app.post("/token")
+async def login(form_data: OAuth2PasswordRequestForm = Depends()):
+    return jwt_login(form_data.username, form_data.password)
+
+
 app.include_router(items_router)
 app.include_router(categories_router)
-
-
-if Path("static").exists():
-    app.mount("/", StaticFiles(directory="static", html=True), name="static")
-else:
-    logger.warning("No static files directory found")
 
 
 # handle all ValueErrors
@@ -36,6 +36,13 @@ async def value_error_exception_handler(_: Request, exc: ValueError):
     )
 
 
-@app.post("/token")
-async def login(form_data: OAuth2PasswordRequestForm = Depends()):
-    return jwt_login(form_data.username, form_data.password)
+# This must be the last route
+static_path = os.path.dirname(os.path.abspath(__file__)) + "/static"
+if Path(static_path).exists():
+    app.mount(
+        "/",
+        StaticFiles(directory=static_path, html=True),
+        name="static",
+    )
+else:
+    logger.warning("No static files directory found")

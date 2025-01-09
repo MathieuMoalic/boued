@@ -34,6 +34,14 @@ def upgrade() -> None:
     # Step 4: Rename the new table to the old table's name
     op.rename_table("item_temp", "item")
 
+    op.create_table(
+        "user",
+        sa.Column("id", sa.Integer(), primary_key=True),
+        sa.Column("username", sa.String(), nullable=False, unique=True, index=True),
+        sa.Column("hashed_password", sa.String(), nullable=False),
+        sa.Column("disabled", sa.Boolean(), nullable=False, default=False),
+    )
+
 
 def downgrade() -> None:
     # Step 1: Create the original table structure
@@ -60,3 +68,5 @@ def downgrade() -> None:
 
     # Step 4: Rename the temp table back to the original name
     op.rename_table("item_temp", "item")
+
+    op.drop_table("user")

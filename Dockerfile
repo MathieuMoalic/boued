@@ -13,4 +13,8 @@ RUN pip install --no-cache-dir ./backend
 COPY --from=frontend /app/build ./static
 COPY backend backend
 EXPOSE 6001
-CMD ["uvicorn", "backend.main:app", "--proxy-headers", "--host", "0.0.0.0", "--port", "6001"]
+ENV DATABASE_URL=sqlite:////data/db1.sqlite
+
+COPY entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+ENTRYPOINT ["/entrypoint.sh"]

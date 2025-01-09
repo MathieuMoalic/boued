@@ -49,7 +49,18 @@ caddy:
         caddy:latest
 
 backend:
-    DATABASE_URL=sqlite:///./test.db \
+    DATABASE_URL=sqlite:////tmp/data/test.sqlite \
     ADMIN_USERNAME=${ADMIN_USERNAME} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD} \
     uvicorn backend.main:app --proxy-headers --host 0.0.0.0 --port 6001 --reload
+
+migrate:
+    cd backend/migrations && \
+    DATABASE_URL=sqlite:///../../test1.db \
+    alembic upgrade head
+
+build-frontend:
+    cd frontend && \
+    npm install && \
+    npm run build && \
+    mv build ../backend/static
