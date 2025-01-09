@@ -17,7 +17,7 @@
     class="m-2 flex justify-between  items-center {item.is_active
         ? 'text-gray-50'
         : 'text-gray-500'}"
-    id="1"
+    id=" {item.id}"
 >
     <div class="flex items-center space-x-0">
         <ToggleActive {item} />
