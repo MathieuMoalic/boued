@@ -21,7 +21,7 @@
                     }
                 }
                 addAlert(
-                    `${item.name} ${item.is_active ? "added" : "removed"}`,
+                    `${item.name} ${item.is_active ? "removed" : "added"}`,
                     "success",
                 );
                 item.is_active = !item.is_active;

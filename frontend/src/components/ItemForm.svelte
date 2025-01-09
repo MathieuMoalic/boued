@@ -28,7 +28,7 @@
                 }
                 $itemForm.isOpen = false;
                 $itemForm.itemID = -1;
-                addAlert("Item updated", "success");
+                addAlert($itemForm.item.name + " updated", "success");
             }
             loading = false;
             return;
@@ -59,7 +59,7 @@
             } else {
                 items.update((items) => [...items, res.data]);
                 $itemForm.isOpen = false;
-                addAlert("Item created", "success");
+                addAlert($itemForm.item.name + " created", "success");
             }
         } else {
             addAlert(`Invalid mode: ${$itemForm.mode}`, "error");

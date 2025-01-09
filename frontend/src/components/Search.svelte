@@ -1,19 +1,12 @@
 <script lang="ts">
     import { searchTerm } from "$lib/store";
-
-    function onInput(e: Event) {
-        const target = e.target as HTMLInputElement | null;
-        if (target) {
-            searchTerm.set(target.value);
-        }
-    }
 </script>
 
 <div class="m-0 p-2">
     <input
         type="text"
         placeholder="Search items..."
-        on:input={onInput}
+        bind:value={$searchTerm}
         class="w-full p-2 bg-red-900 border-gray-600 rounded
                placeholder-gray-400 border-0 focus:outline-none focus:ring-2 focus:ring-red-500"
     />
