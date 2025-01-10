@@ -1,6 +1,12 @@
 #!/bin/sh
 set -e
 
+echo $DATABASE_URL
+if [ "$(echo $DATABASE_URL | cut -c1-9)" != "sqlite://" ]; then
+    echo "Database URL is not valid"
+    exit 1
+fi
+
 DATABASE_PATH=${DATABASE_URL#sqlite:///}
 
 if [ -f $DATABASE_PATH ]; then
