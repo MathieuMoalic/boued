@@ -8,10 +8,12 @@ RUN npm run build
 
 FROM python:3.13-slim
 WORKDIR /app
-COPY backend/pyproject.toml backend/pyproject.toml
-RUN pip install --no-cache-dir ./backend
-COPY --from=frontend /app/build ./static
-COPY backend backend
+COPY backend/pyproject.toml /app/backend/pyproject.toml
+RUN pip install --no-cache-dir /app/backend
+
+COPY backend /app/backend
+COPY --from=frontend /app/build /app/backend/static
+
 EXPOSE 6001
 ENV DATABASE_URL=sqlite:////data/db1.sqlite
 
