@@ -2,10 +2,6 @@
     import { Li } from "flowbite-svelte";
 
     import type { ItemRead } from "$lib/Api";
-    import QuantityField from "$components/QuantityField.svelte";
-    import UnitField from "$components/UnitField.svelte";
-    import NameField from "$components/NameField.svelte";
-    import Notes from "$components/Notes.svelte";
     import ToggleActive from "$components/ToggleActive.svelte";
     import EditItem from "./EditItem.svelte";
 
@@ -14,18 +10,33 @@
 
 <Li
     icon
-    class="m-2 flex justify-between  items-center {item.is_active
+    class="m-0 flex justify-between items-center {item.is_active
         ? 'text-gray-50'
         : 'text-gray-500'}"
     id=" {item.id}"
 >
-    <div class="flex items-center space-x-0">
+    <div class="flex items-center truncate overflow-hidden max-w-full">
         <ToggleActive {item} />
-        <QuantityField {item} />
-        <UnitField {item} />
-        <NameField {item} />
+        {#if item.quantity !== null}
+            <div class="mr-1">
+                {item.quantity}
+            </div>
+        {/if}
+        {#if item.unit !== "None"}
+            <div class="mr-2">
+                {item.unit}
+            </div>
+        {/if}
+        <span class="overflow-ellipsis">
+            {item.name}
+        </span>
+        {#if item.notes !== ""}
+            <div class="w-2"></div>
+            <span class="text-gray-500 truncate overflow-hidden text-ellipsis">
+                | {item.notes}
+            </span>
+        {/if}
     </div>
-    <Notes {item} />
 
     <div class="ml-auto">
         <EditItem {item} />
