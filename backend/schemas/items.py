@@ -10,9 +10,9 @@ class ItemCreate(BaseModel):
 
     name: str
     category_id: int
-    notes: Optional[str] = None
+    notes: str
     quantity: Optional[float] = None
-    unit: Optional[str] = None
+    unit: str
 
 
 class ItemUpdate(BaseModel):
@@ -37,6 +37,6 @@ class ItemRead(BaseModel):
     name: str
     category_id: int
     is_active: bool
-    notes: Optional[str]
+    notes: str
     quantity: Optional[float]
-    unit: Optional[str]
+    unit: str

@@ -49,7 +49,11 @@ caddy:
         caddy:latest
 
 backend:
-    DATABASE_URL=sqlite:////tmp/data/test.sqlite \
+    scp homeserver:podman/groceries/db1.sqlite /tmp/data/
+    
+    cd backend/migrations && DATABASE_URL=sqlite:////tmp/data/db1.sqlite alembic upgrade head && cd -
+
+    DATABASE_URL=sqlite:////tmp/data/db1.sqlite \
     ADMIN_USERNAME=${ADMIN_USERNAME} \
     ADMIN_PASSWORD=${ADMIN_PASSWORD} \
     uvicorn backend.main:app --proxy-headers --host 0.0.0.0 --port 6001 --reload
