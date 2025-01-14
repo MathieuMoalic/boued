@@ -8,14 +8,12 @@
     export let item: ItemRead;
 </script>
 
-<Li
-    icon
-    class="m-0 flex justify-between items-center {item.is_active
-        ? 'text-gray-50'
-        : 'text-gray-500'}"
-    id=" {item.id}"
->
-    <div class="flex items-center truncate overflow-hidden max-w-full">
+<Li icon class="m-0 flex justify-between items-center">
+    <div
+        class="flex items-center truncate overflow-hidden max-w-full {item.is_active
+            ? 'text-gray-50'
+            : 'text-gray-400'}"
+    >
         <ToggleActive {item} />
         {#if item.quantity !== null}
             <div class="mr-1">
