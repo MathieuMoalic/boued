@@ -9,6 +9,7 @@ class CategoryCreate(BaseModel):
     """
 
     name: str
+    order: Optional[int] = None
 
 
 class CategoryUpdate(BaseModel):
@@ -17,6 +18,7 @@ class CategoryUpdate(BaseModel):
     """
 
     name: Optional[str] = None
+    order: Optional[int] = None
 
 
 class CategoryRead(BaseModel):
@@ -26,3 +28,4 @@ class CategoryRead(BaseModel):
 
     id: int
     name: str
+    order: int

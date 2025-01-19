@@ -6,6 +6,7 @@ from sqlmodel import Field, SQLModel
 class Category(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     name: str = Field(index=True, unique=True)
+    order: int = Field(unique=True)
 
 
 class Item(SQLModel, table=True):
