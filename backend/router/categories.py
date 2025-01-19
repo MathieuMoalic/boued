@@ -7,6 +7,7 @@ from backend.crud.categories import (
     create_category,
     delete_category,
     read_categories,
+    reorder_categories,
     update_category,
 )
 from backend.database import get_session
@@ -55,6 +56,25 @@ def update_category_endpoint(
         session, category_id, update_data.model_dump(exclude_unset=True)
     )
     return category
+
+
+@router.put(
+    "/reorder/{category_id}",
+    response_model=list[CategoryRead],
+    operation_id="categoryReorder",
+)
+def reorder_category_endpoint(
+    category_id: int,
+    direction: str,
+    session: Session = Depends(get_session),
+):
+    if direction not in ["up", "down"]:
+        raise ValueError("Invalid direction")
+    """
+    Reorder a category by ID.
+    """
+    categories = reorder_categories(session, category_id, direction)
+    return categories
 
 
 @router.delete(

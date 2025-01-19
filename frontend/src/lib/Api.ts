@@ -35,6 +35,8 @@ export interface BodyLoginTokenPost {
 export interface CategoryCreate {
   /** Name */
   name: string;
+  /** Order */
+  order?: number | null;
 }
 
 /**
@@ -46,6 +48,8 @@ export interface CategoryRead {
   id: number;
   /** Name */
   name: string;
+  /** Order */
+  order: number;
 }
 
 /**
@@ -55,6 +59,8 @@ export interface CategoryRead {
 export interface CategoryUpdate {
   /** Name */
   name?: string | null;
+  /** Order */
+  order?: number | null;
 }
 
 /** HTTPValidationError */
@@ -73,11 +79,11 @@ export interface ItemCreate {
   /** Category Id */
   category_id: number;
   /** Notes */
-  notes?: string | null;
+  notes: string;
   /** Quantity */
   quantity?: number | null;
   /** Unit */
-  unit?: string | null;
+  unit: string;
 }
 
 /**
@@ -94,11 +100,11 @@ export interface ItemRead {
   /** Is Active */
   is_active: boolean;
   /** Notes */
-  notes: string | null;
+  notes: string;
   /** Quantity */
   quantity: number | null;
   /** Unit */
-  unit: string | null;
+  unit: string;
 }
 
 /**
@@ -345,6 +351,24 @@ export class HttpClient<SecurityDataType = unknown> {
  * @version 0.1.0
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
+  token = {
+    /**
+     * No description
+     *
+     * @name LoginTokenPost
+     * @summary Login
+     * @request POST:/token
+     */
+    loginTokenPost: (data: BodyLoginTokenPost, params: RequestParams = {}) =>
+      this.request<any, HTTPValidationError>({
+        path: `/token`,
+        method: "POST",
+        body: data,
+        type: ContentType.UrlEncoded,
+        format: "json",
+        ...params,
+      }),
+  };
   api = {
     /**
      * @description Read all items.
@@ -515,21 +539,29 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
         format: "json",
         ...params,
       }),
-  };
-  token = {
+
     /**
      * No description
      *
-     * @name LoginTokenPost
-     * @summary Login
-     * @request POST:/token
+     * @tags categories
+     * @name CategoryReorder
+     * @summary Reorder Category Endpoint
+     * @request PUT:/api/categories/reorder/{category_id}
+     * @secure
      */
-    loginTokenPost: (data: BodyLoginTokenPost, params: RequestParams = {}) =>
-      this.request<any, HTTPValidationError>({
-        path: `/token`,
-        method: "POST",
-        body: data,
-        type: ContentType.UrlEncoded,
+    categoryReorder: (
+      categoryId: number,
+      query: {
+        /** Direction */
+        direction: string;
+      },
+      params: RequestParams = {},
+    ) =>
+      this.request<CategoryRead[], HTTPValidationError>({
+        path: `/api/categories/reorder/${categoryId}`,
+        method: "PUT",
+        query: query,
+        secure: true,
         format: "json",
         ...params,
       }),

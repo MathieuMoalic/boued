@@ -1,6 +1,6 @@
 from typing import Any, Sequence
 
-from sqlmodel import Session, select
+from sqlmodel import Session, select, update
 
 from backend.models import Category, Item
 
@@ -112,33 +112,57 @@ def delete_category(session: Session, category_id: int) -> Category:
     return category
 
 
-def reorder_categories(session: Session, category_id: int, new_order: int) -> None:
+def reorder_categories(
+    session: Session, category_id: int, direction: str
+) -> list[Category]:
     """
-    Reorder a category by adjusting the 'order' field.
+    Reorder a category by adjusting its 'order' field.
+
+    Args:
+        session (Session): The database session.
+        category_id (int): The ID of the category to reorder.
+        new_order (int): The new 'order' position.
+
     Raises:
-        ValueError: If the category does not exist or the new order conflicts.
+        ValueError: If the category does not exist.
     """
+    # Fetch the category
     category = session.get(Category, category_id)
     if not category:
-        raise ValueError("Category not found.")
+        raise ValueError(f"Category with id={category_id} not found.")
 
-    # Shift orders to accommodate the new order
-    if category.order < new_order:
-        # Move down: Decrement orders in the range (old_order, new_order]
-        session.exec(
-            select(Category).where(
-                (Category.order > category.order) & (Category.order <= new_order)
-            )
-        ).update({"order": Category.order - 1})
-    elif category.order > new_order:
-        # Move up: Increment orders in the range [new_order, old_order)
-        session.exec(
-            select(Category).where(
-                (Category.order >= new_order) & (Category.order < category.order)
-            )
-        ).update({"order": Category.order + 1})
+    old_order = category.order
+    new_order = old_order + 1 if direction == "down" else old_order - 1
+
+    category.order = -1  # or some guaranteed-unique placeholder
+    session.add(category)
+    session.commit()
+
+    # Shift orders for other categories in the range
+    if old_order < new_order:
+        # Move DOWN: Decrement orders in range (old_order, new_order]
+        stmt = (
+            update(Category)
+            .where((Category.order > old_order) & (Category.order <= new_order))
+            .values(order=Category.order - 1)  # subtract 1 from the column
+        )
+        session.exec(stmt)
+
+    elif old_order > new_order:
+        # Move UP: Increment orders in range [new_order, old_order)
+        stmt = (
+            update(Category)
+            .where((Category.order >= new_order) & (Category.order < old_order))
+            .values(order=Category.order + 1)  # add 1 to the column
+        )
+        session.exec(stmt)
 
     # Update the order of the current category
     category.order = new_order
     session.add(category)
     session.commit()
+
+    # Optional: see final state
+    all_categories = read_categories(session)
+    print(all_categories)
+    return all_categories
