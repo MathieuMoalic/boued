@@ -28,7 +28,14 @@
 				addAlert("Failed to fetch categories: " + res.error, "error");
 			});
 	}
+
+	function handleVisibilityChange() {
+		if (document.visibilityState === "visible") {
+			fetchData();
+		}
+	}
 	onMount(async () => {
+		document.addEventListener("visibilitychange", handleVisibilityChange);
 		const token = localStorage.getItem("token");
 		if (!token) {
 			goto("/login");
