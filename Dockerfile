@@ -17,6 +17,8 @@ COPY --from=frontend /app/build /app/backend/static
 EXPOSE 6001
 ENV DATABASE_URL=sqlite:////data/db1.sqlite
 
+RUN apt update && apt install -y sqlite3
+
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
