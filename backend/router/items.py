@@ -17,6 +17,7 @@ from backend.schemas.items import (
     ItemRead,
     ItemUpdate,
 )
+from backend.websocket import ws
 
 router = APIRouter(
     prefix="/api/items",
@@ -25,19 +26,19 @@ router = APIRouter(
 )
 
 
-@router.post("", response_model=ItemRead, operation_id="itemCreate")
-def create_item_endpoint(
+@router.post("", operation_id="itemCreate")
+async def create_item_endpoint(
     item_data: ItemCreate, session: Session = Depends(get_session)
 ):
     """
     Create a new item.
     """
     item = create_item(session, item_data.model_dump())
-    return item
+    await ws.send_message(action="create", obj_type="item", data=item.model_dump())
 
 
 @router.get("", response_model=List[ItemRead], operation_id="itemReadAll")
-def read_items_endpoint(session: Session = Depends(get_session)):
+async def read_items_endpoint(session: Session = Depends(get_session)):
     """
     Read all items.
     """
@@ -45,8 +46,12 @@ def read_items_endpoint(session: Session = Depends(get_session)):
     return items
 
 
-@router.get("/{item_id}", response_model=ItemRead, operation_id="itemRead")
-def read_item_endpoint(item_id: int, session: Session = Depends(get_session)):
+@router.get(
+    "/{item_id}",
+    operation_id="itemRead",
+    response_model=ItemRead,
+)
+async def read_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     """
     Read a single item by ID.
     """
@@ -54,21 +59,21 @@ def read_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     return item
 
 
-@router.put("/{item_id}", response_model=ItemRead, operation_id="itemUpdate")
-def update_item_endpoint(
+@router.put("/{item_id}", operation_id="itemUpdate")
+async def update_item_endpoint(
     item_id: int, update_data: ItemUpdate, session: Session = Depends(get_session)
 ):
     """
     Update an existing item by ID.
     """
     item = update_item(session, item_id, update_data.model_dump(exclude_unset=True))
-    return item
+    await ws.send_message(action="update", obj_type="item", data=item.model_dump())
 
 
-@router.delete("/{item_id}", response_model=ItemRead, operation_id="itemDelete")
-def delete_item_endpoint(item_id: int, session: Session = Depends(get_session)):
+@router.delete("/{item_id}", operation_id="itemDelete")
+async def delete_item_endpoint(item_id: int, session: Session = Depends(get_session)):
     """
     Delete an item by ID.
     """
     item = delete_item(session, item_id)
-    return item
+    await ws.send_message(action="delete", obj_type="item", data=item.model_dump())

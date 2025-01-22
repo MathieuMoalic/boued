@@ -22,15 +22,9 @@
         if (!editCategoryInput) return;
 
         api.categoryUpdate(id, { name: editCategoryInput })
-            .then((res) => {
-                categories.update((cats) =>
-                    cats.map((cat) =>
-                        cat.id === id ? { ...cat, name: res.data.name } : cat,
-                    ),
-                );
+            .then((_) => {
                 editCategory = "";
                 editCategoryInput = "";
-                addAlert("Category edited", "success");
             })
             .catch((res) => {
                 addAlert(
@@ -45,37 +39,15 @@
             addAlert("Cannot delete this category", "error");
             return;
         }
-        api.categoryDelete(id)
-            .then((_) => {
-                categories.update((cats) =>
-                    cats.filter((cat) => cat.id !== id),
-                );
-                addAlert("Category deleted", "success");
-                for (let i = 0; i < $items.length; i++) {
-                    if ($items[i].category_id === id) {
-                        $items[i].category_id = 1;
-                    }
-                }
-            })
-            .catch((res) => {
-                addAlert(
-                    res.error.detail || "Failed to delete category",
-                    "error",
-                );
-            });
+        api.categoryDelete(id).catch((res) => {
+            addAlert(res.error.detail || "Failed to delete category", "error");
+        });
     }
 
     async function moveCategory(id: number, direction: "up" | "down") {
-        api.categoryReorder(id, { direction })
-            .then((res) => {
-                categories.set(res.data);
-            })
-            .catch((res) => {
-                addAlert(
-                    res.error.detail || "Failed to move category",
-                    "error",
-                );
-            });
+        api.categoryReorder(id, { direction }).catch((res) => {
+            addAlert(res.error.detail || "Failed to move category", "error");
+        });
     }
 </script>
 

@@ -11,6 +11,7 @@
 	import Alert from "$components/Alert.svelte";
 	import { addAlert } from "$lib/alert";
 	import { goto } from "$app/navigation";
+	import { connectWebSocket } from "$lib/ws";
 
 	async function fetchData() {
 		api.itemReadAll()
@@ -35,13 +36,14 @@
 		}
 	}
 	onMount(async () => {
-		document.addEventListener("visibilitychange", handleVisibilityChange);
+		// document.addEventListener("visibilitychange", handleVisibilityChange);
 		const token = localStorage.getItem("token");
 		if (!token) {
 			goto("/login");
 		} else {
 			apiInner.setSecurityData({ accessToken: token });
 		}
+		connectWebSocket();
 		await fetchData();
 	});
 </script>

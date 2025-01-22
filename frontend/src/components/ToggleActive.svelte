@@ -15,25 +15,6 @@
         loading = true;
         searchTerm.set("");
         api.itemUpdate(item.id, { is_active: !item.is_active })
-            .then((_) => {
-                for (let i = 0; i < $items.length; i++) {
-                    if ($items[i].id === item.id) {
-                        $items[i].is_active = item.is_active;
-                    }
-                }
-                addAlert(
-                    `${item.name} ${item.is_active ? "removed" : "added"}`,
-                    "success",
-                );
-                item.is_active = !item.is_active;
-                // update the Li class manually
-                const li = document.getElementById(" " + item.id);
-                if (li) {
-                    li.className = `m-2 flex justify-between items-center ${
-                        item.is_active ? "text-gray-50" : "text-gray-500"
-                    }`;
-                }
-            })
             .catch((res) => {
                 addAlert(
                     res.error.detail || "Failed to toggle the active status",

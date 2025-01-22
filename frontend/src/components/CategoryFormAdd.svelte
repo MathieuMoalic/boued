@@ -10,10 +10,8 @@
         if (!inputValue) return;
 
         api.categoryCreate({ name: inputValue })
-            .then((res) => {
-                categories.update((cats) => [...cats, res.data]);
+            .then((_) => {
                 inputValue = "";
-                addAlert("Category created", "success");
             })
             .catch((res) => {
                 addAlert(
@@ -24,7 +22,7 @@
     }
 </script>
 
-<div class="flex">
+<div class="flex ml-4 mr-7">
     <Input
         placeholder="Add category"
         bind:value={inputValue}

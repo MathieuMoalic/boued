@@ -2,7 +2,7 @@ import logging
 import os
 from pathlib import Path
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI, Request, WebSocket
 from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
@@ -10,12 +10,18 @@ from fastapi.staticfiles import StaticFiles
 from backend.jwt import jwt_login
 from backend.router.categories import router as categories_router
 from backend.router.items import router as items_router
+from backend.websocket import handle_websocket
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("database")
 
 
 app = FastAPI()
+
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    await handle_websocket(websocket)
 
 
 @app.post("/token")

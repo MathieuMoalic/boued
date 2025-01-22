@@ -1,36 +1,24 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
-    import { items, itemForm, categories } from "$lib/store";
+    import { itemForm, categories } from "$lib/store";
     import { possibleUnits } from "$lib/types";
     import { Button, Modal, Label, Input, Spinner } from "flowbite-svelte";
     import CategoryForm from "./CategoryForm.svelte";
     import { api } from "$lib/auth";
 
-    let loading = false;
     async function submitItem() {
         if ($itemForm.mode == "edit") {
-            loading = true;
-            let res = await api.itemUpdate($itemForm.itemID, $itemForm.item);
-            if (!res.ok) {
-                addAlert(
-                    `Failed to update the item '${$itemForm.item.name}':${res.error}`,
-                    "error",
-                );
-                loading = false;
-                return;
-            } else {
-                let item = res.data;
-                for (let i = 0; i < $items.length; i++) {
-                    if ($items[i].id == item.id) {
-                        $items[i] = item;
-                        break;
-                    }
-                }
-                $itemForm.isOpen = false;
-                $itemForm.itemID = -1;
-                addAlert($itemForm.item.name + " updated", "success");
-            }
-            loading = false;
+            api.itemUpdate($itemForm.itemID, $itemForm.item)
+                .then((_) => {
+                    $itemForm.isOpen = false;
+                    $itemForm.itemID = -1;
+                })
+                .catch((res) => {
+                    addAlert(
+                        `Failed to update the item '${$itemForm.item.name}':${res.error}`,
+                        "error",
+                    );
+                });
             return;
         } else if ($itemForm.mode == "add") {
             if (!$itemForm.item.name) {
@@ -41,48 +29,43 @@
                 addAlert("Category is required", "error");
                 return;
             }
-            loading = true;
-            let res = await api.itemCreate({
+            if (!$itemForm.item.unit) {
+                $itemForm.item.unit = "None";
+            }
+            if (!$itemForm.item.notes) {
+                $itemForm.item.notes = "";
+            }
+            api.itemCreate({
                 name: $itemForm.item.name,
                 notes: $itemForm.item.notes,
                 quantity: $itemForm.item.quantity,
                 unit: $itemForm.item.unit,
                 category_id: $itemForm.item.category_id,
-            });
-            if (!res.ok) {
-                addAlert(
-                    `Failed to update the item '${$itemForm.item.name}':${res.error}`,
-                    "error",
-                );
-                loading = false;
-                return;
-            } else {
-                items.update((items) => [...items, res.data]);
-                $itemForm.isOpen = false;
-                addAlert($itemForm.item.name + " created", "success");
-            }
-        } else {
-            addAlert(`Invalid mode: ${$itemForm.mode}`, "error");
+            })
+                .then((_) => {
+                    $itemForm.isOpen = false;
+                })
+                .catch((res) => {
+                    addAlert(
+                        `Failed to create the item '${$itemForm.item.name}':${res.error}`,
+                        "error",
+                    );
+                });
         }
-        loading = false;
     }
 
     async function deleteItem() {
-        let res = await api.itemDelete($itemForm.itemID);
-        if (!res.ok) {
-            addAlert(
-                `Failed to delete the item '${$itemForm.item.name}':${res.error}`,
-                "error",
-            );
-            return;
-        } else {
-            items.update((items) =>
-                items.filter((item) => item.id != $itemForm.itemID),
-            );
-            $itemForm.isOpen = false;
-            $itemForm.itemID = -1;
-            addAlert(`"${$itemForm.item.name}" deleted`, "success");
-        }
+        api.itemDelete($itemForm.itemID)
+            .then((_) => {
+                $itemForm.isOpen = false;
+                $itemForm.itemID = -1;
+            })
+            .catch((res) => {
+                addAlert(
+                    `Failed to delete the item '${$itemForm.item.name}':${res.error}`,
+                    "error",
+                );
+            });
     }
 </script>
 
@@ -201,9 +184,7 @@
             class="w-full py-2 bg-buttonBg text-primaryText font-semibold rounded-md"
             on:click={submitItem}
         >
-            {#if loading}
-                <Spinner class="h-6" />
-            {:else if $itemForm.mode == "edit"}
+            {#if $itemForm.mode == "edit"}
                 Save
             {:else}
                 Add Item

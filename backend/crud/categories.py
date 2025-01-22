@@ -83,6 +83,7 @@ def update_category(
     session.add(category)
     session.commit()
     session.refresh(category)
+
     return category
 
 
@@ -164,5 +165,4 @@ def reorder_categories(
 
     # Optional: see final state
     all_categories = read_categories(session)
-    print(all_categories)
     return all_categories
