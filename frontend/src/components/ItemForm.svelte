@@ -2,7 +2,7 @@
     import { addAlert } from "$lib/alert";
     import { itemForm, categories } from "$lib/store";
     import { possibleUnits } from "$lib/types";
-    import { Button, Modal, Label, Input, Spinner } from "flowbite-svelte";
+    import { Button, Modal, Label, Input } from "flowbite-svelte";
     import CategoryForm from "./CategoryForm.svelte";
     import { api } from "$lib/auth";
 
@@ -75,21 +75,13 @@
     outsideclose
     class="bg-primaryBg text-primaryText rounded-lg"
 >
-    <!-- svelte-ignore a11y_click_events_have_key_events -->
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-        class="flex flex-col space-y-4 p-3 rounded-lg shadow-lg bg-primaryBg text-primaryText"
+        class="flex flex-col space-y-4 p-1 pt-0 rounded-lg shadow-lg bg-primaryBg text-primaryText"
         role="dialog"
         on:click={(e) => e.stopPropagation()}
+        on:keydown={(e) => e.key === "Escape" && ($itemForm.isOpen = false)}
     >
-        <h3 class="text-lg font-semibold text-primaryText">
-            {#if $itemForm.mode == "edit"}
-                Edit Item
-            {:else}
-                Add a New Item
-            {/if}
-        </h3>
-
         <Label class="space-y-1 text-sm text-primaryText">
             <span>Name</span>
             <Input
@@ -104,13 +96,33 @@
 
         <Label class="space-y-1 text-sm text-primaryText">
             <span>Quantity</span>
-            <Input
-                type="number"
-                name="quantity"
-                bind:value={$itemForm.item.quantity}
-                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
-                placeholder="Enter quantity"
-            />
+            <div class="flex items-center space-x-2">
+                <Button
+                    on:click={() =>
+                        ($itemForm.item.quantity = Math.max(
+                            0,
+                            ($itemForm.item.quantity ?? 0) - 1,
+                        ))}
+                    class="px-3 py-1 bg-red-500 text-gray-700 rounded-md w-14 h-10 text-3xl"
+                >
+                    -
+                </Button>
+                <Input
+                    name="quantity"
+                    bind:value={$itemForm.item.quantity}
+                    class="w-fill text-center bg-secondaryBg border-inputBorderColor rounded-md text-primaryText
+                    "
+                    placeholder="Enter quantity"
+                />
+                <Button
+                    on:click={() =>
+                        ($itemForm.item.quantity =
+                            ($itemForm.item.quantity ?? 0) + 1)}
+                    class="px-3 py-1 bg-red-500 text-gray-700 rounded-md w-14 h-10 text-xl"
+                >
+                    +
+                </Button>
+            </div>
         </Label>
 
         <div>
