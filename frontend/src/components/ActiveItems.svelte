@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { onMount } from "svelte";
     import { categories, items } from "$lib/store";
     import { List } from "flowbite-svelte";
     import ItemComp from "$components/Item.svelte";
@@ -6,12 +7,21 @@
 
     let collapsed: number[] = [];
 
+    // Load collapsed state from localStorage on mount
+    onMount(() => {
+        const storedCollapsed = localStorage.getItem("collapsedCategories");
+        if (storedCollapsed) {
+            collapsed = JSON.parse(storedCollapsed);
+        }
+    });
+
     function toggleCategory(catId: number) {
         if (collapsed.includes(catId)) {
             collapsed = collapsed.filter((id) => id !== catId);
         } else {
             collapsed = [...collapsed, catId];
         }
+        localStorage.setItem("collapsedCategories", JSON.stringify(collapsed));
     }
 </script>
 
