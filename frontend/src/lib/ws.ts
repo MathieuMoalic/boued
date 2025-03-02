@@ -1,7 +1,9 @@
-import { addAlert } from "./alert";
 import { categories, items } from "./store";
 
 let ws: WebSocket;
+let reconnectAttempts = 0;
+const maxReconnectAttempts = 10;
+const baseReconnectDelay = 1000; // 1 second
 
 interface WebSocketMessage {
     action: "create" | "update" | "delete" | "reorder";
@@ -11,10 +13,15 @@ interface WebSocketMessage {
 
 
 export const connectWebSocket = () => {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        return;
+    }
+
     ws = new WebSocket("/ws");
 
     ws.addEventListener("open", () => {
         console.log("WebSocket connection established");
+        reconnectAttempts = 0; // Reset on successful connection
     });
 
     ws.addEventListener("message", (event) => {
@@ -22,12 +29,27 @@ export const connectWebSocket = () => {
     });
 
     ws.addEventListener("close", () => {
-        console.log("WebSocket connection closed");
+        console.log("WebSocket connection closed, attempting to reconnect...");
+        attemptReconnect();
     });
 
     ws.addEventListener("error", (error) => {
         console.error("WebSocket error:", error);
+        ws?.close();
     });
+};
+
+const attemptReconnect = () => {
+    if (reconnectAttempts < maxReconnectAttempts) {
+        const delay = Math.min(baseReconnectDelay * 2 ** reconnectAttempts, 30000); // Max delay of 30 sec
+        reconnectAttempts++;
+        setTimeout(() => {
+            console.log(`Reconnecting... Attempt ${reconnectAttempts}`);
+            connectWebSocket();
+        }, delay);
+    } else {
+        console.warn("Max reconnect attempts reached. Stopping retries.");
+    }
 };
 
 function handleMessages(data: any) {
@@ -49,10 +71,8 @@ function handleUpdate(store: any, data: any, action: string) {
     store.update((currentData: any[]) => {
         switch (action) {
             case "create":
-                console.log("create", data);
                 return [...currentData, data];
             case "update":
-                // addAlert(`${item.name} updated`, "success");
                 return currentData.map((item) =>
                     item.id === data.id ? { ...item, ...data } : item
                 );
@@ -66,3 +86,11 @@ function handleUpdate(store: any, data: any, action: string) {
         }
     });
 }
+
+// Ensure the WebSocket reconnects when the app comes back from background
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible") {
+        console.log("App resumed, checking WebSocket connection...");
+        connectWebSocket();
+    }
+});
