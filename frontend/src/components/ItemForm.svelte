@@ -154,11 +154,12 @@
                 {#each $categories as category}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                         text-primaryText ${
-                             category.id == $itemForm.item.category_id
-                                 ? "bg-buttonBg"
-                                 : "bg-secondaryBg"
-                         }`}
+                        text-primaryText max-w-[120px] truncate ${
+                            category.id == $itemForm.item.category_id
+                                ? "bg-buttonBg"
+                                : "bg-secondaryBg"
+                        }`}
+                        title={category.name}
                     >
                         <input
                             type="radio"
@@ -168,9 +169,12 @@
                             name="category"
                             class="hidden"
                         />
-                        {category.name}
+                        <span class="truncate w-full text-center"
+                            >{category.name}</span
+                        >
                     </label>
                 {/each}
+
                 <label
                     class="inline-flex items-center justify-center p-1 cursor-pointer rounded-md bg-secondaryBg
                         text-primaryText"
