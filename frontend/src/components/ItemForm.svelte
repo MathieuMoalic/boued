@@ -73,28 +73,28 @@
     bind:open={$itemForm.isOpen}
     size="xs"
     outsideclose
-    class="bg-primaryBg text-primaryText rounded-lg"
+    class="bg-gray-800 text-primary-200 rounded-lg"
 >
     <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
     <div
-        class="flex flex-col space-y-4 p-1 pt-0 rounded-lg shadow-lg bg-primaryBg text-primaryText"
+        class="flex flex-col space-y-4 p-1 pt-0 rounded-lg shadow-lgtext-primary-200"
         role="dialog"
         on:click={(e) => e.stopPropagation()}
         on:keydown={(e) => e.key === "Escape" && ($itemForm.isOpen = false)}
     >
-        <Label class="space-y-1 text-sm text-primaryText">
+        <Label class="space-y-1 text-sm text-primary-200">
             <span>Name</span>
             <Input
                 type="text"
                 name="name"
                 bind:value={$itemForm.item.name}
-                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
+                class="bg-primary-700 border-primary-700 rounded-md text-primary-200"
                 placeholder="Enter a name"
                 required
             />
         </Label>
 
-        <Label class="space-y-1 text-sm text-primaryText">
+        <Label class="space-y-1 text-sm text-primary-200">
             <span>Quantity</span>
             <div class="flex items-center space-x-2">
                 <Button
@@ -103,14 +103,14 @@
                             0,
                             ($itemForm.item.quantity ?? 0) - 1,
                         ))}
-                    class="px-3 py-1 bg-red-500 text-gray-700 rounded-md w-14 h-10 text-3xl"
+                    class="px-3 py-1 bg-primary-800 text-primary-200 rounded-md w-14 h-10 text-3xl"
                 >
                     -
                 </Button>
                 <Input
                     name="quantity"
                     bind:value={$itemForm.item.quantity}
-                    class="w-fill text-center bg-secondaryBg border-inputBorderColor rounded-md text-primaryText
+                    class="w-fill text-center bg-primary-700 border-primary-700 rounded-md text-primary-200 placeholder-gray-400
                     "
                     placeholder="Enter quantity"
                 />
@@ -118,7 +118,7 @@
                     on:click={() =>
                         ($itemForm.item.quantity =
                             ($itemForm.item.quantity ?? 0) + 1)}
-                    class="px-3 py-1 bg-red-500 text-gray-700 rounded-md w-14 h-10 text-xl"
+                    class="px-3 py-1 bg-primary-800 text-primary-200 rounded-md w-14 h-10 text-xl"
                 >
                     +
                 </Button>
@@ -126,12 +126,12 @@
         </Label>
 
         <div>
-            <span class="block text-sm font-medium text-primaryText">Unit</span>
+            <span class="block text-sm font-medium text-primary-200">Unit</span>
             <div class="m-1 grid grid-cols-4 gap-1">
                 {#each possibleUnits as choice}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                         text-primaryText ${choice == $itemForm.item.unit ? "bg-buttonBg" : "bg-secondaryBg"}`}
+                         text-primary-200 ${choice == $itemForm.item.unit ? "bg-primary-600" : "bg-primary-800"}`}
                     >
                         <input
                             type="radio"
@@ -147,17 +147,17 @@
         </div>
 
         <div>
-            <span class="block text-sm font-medium text-primaryText"
+            <span class="block text-sm font-medium text-primary-200"
                 >Category</span
             >
             <div class="m-1 grid grid-cols-3 gap-1">
                 {#each $categories as category}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded-md
-                        text-primaryText max-w-[120px] truncate ${
+                        text-primary-200 max-w-[120px] truncate ${
                             category.id == $itemForm.item.category_id
-                                ? "bg-buttonBg"
-                                : "bg-secondaryBg"
+                                ? "bg-primary-600"
+                                : "bg-primary-800"
                         }`}
                         title={category.name}
                     >
@@ -176,28 +176,27 @@
                 {/each}
 
                 <label
-                    class="inline-flex items-center justify-center p-1 cursor-pointer rounded-md bg-secondaryBg
-                        text-primaryText"
+                    class="inline-flex items-center justify-center p-1 cursor-pointer rounded-md bg-primary-800 text-primary-200"
                 >
                     <CategoryForm />
                 </label>
             </div>
         </div>
 
-        <Label class="space-y-1 text-sm text-primaryText">
+        <Label class="space-y-1 text-sm text-primary-200">
             <span>Notes</span>
             <Input
                 type="text"
                 name="notes"
                 bind:value={$itemForm.item.notes}
-                class="bg-secondaryBg border-inputBorderColor rounded-md text-primaryText"
+                class="bg-primary-700 border-primary-700 rounded-md text-primary-200 placeholder-gray-400"
                 placeholder="Enter notes"
             />
         </Label>
 
         <Button
             type="submit"
-            class="w-full py-2 bg-buttonBg text-primaryText font-semibold rounded-md"
+            class="w-full py-2 bg-primary-600 text-primary-200 font-semibold rounded-md"
             on:click={submitItem}
         >
             {#if $itemForm.mode == "edit"}
@@ -210,7 +209,7 @@
         {#if $itemForm.mode == "edit"}
             <Button
                 type="button"
-                class="w-full py-2 bg-red-600 hover:bg-red-700 text-primaryText font-semibold rounded-md"
+                class="w-full py-2 bg-red-800 hover:bg-primary-700 text-primary-200 font-semibold rounded-md"
                 on:click={deleteItem}
             >
                 Delete

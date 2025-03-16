@@ -26,7 +26,7 @@
     <Input
         placeholder="Add category"
         bind:value={inputValue}
-        class="bg-primaryBg border-inputBorderColor rounded-md text-primaryText`"
+        class="bg-primary-800 border-primary-700 rounded-md text-primary-200 placeholder-gray-400"
         on:keydown={(e) => e.key === "Enter" && addCategory()}
     />
     <button on:click={addCategory}>

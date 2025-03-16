@@ -5,7 +5,7 @@
 
 <Button
     size="lg"
-    class="fixed bottom-4 right-4 bg-buttonBg"
+    class="fixed bottom-4 right-4 bg-primary-700"
     on:click={() => {
         $itemForm.mode = "add";
         $itemForm.item = {

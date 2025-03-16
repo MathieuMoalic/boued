@@ -18,5 +18,8 @@
         $itemForm.itemID = item.id;
     }}
 >
-    <EditOutline size="md" />
+    <EditOutline
+        size="md"
+        class="text-primary-500 rounded-md backdrop-blur-sm h-6 w-6"
+    />
 </Button>

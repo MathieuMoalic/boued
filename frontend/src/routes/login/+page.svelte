@@ -31,7 +31,7 @@
     >
         <h1 class="text-2xl font-bold text-center mb-6">Login</h1>
         {#if error}
-            <p class="text-sm text-red-400 mb-4">{error}</p>
+            <p class="text-sm text-primary-400 mb-4">{error}</p>
         {/if}
         <form class="space-y-4" on:submit|preventDefault={login}>
             <div>
@@ -43,7 +43,7 @@
                     type="text"
                     bind:value={username}
                     required
-                    class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                    class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 />
             </div>
             <div>
@@ -55,12 +55,12 @@
                     type="password"
                     bind:value={password}
                     required
-                    class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 border-gray-600 shadow-sm focus:border-red-500 focus:ring-red-500"
+                    class="mt-1 block w-full rounded-md bg-gray-700 text-gray-200 border-gray-600 shadow-sm focus:border-primary-500 focus:ring-primary-500"
                 />
             </div>
             <button
                 type="submit"
-                class="w-full bg-red-500 text-white py-2 px-4 rounded-md shadow hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                class="w-full bg-primary-500 text-white py-2 px-4 rounded-md shadow hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500"
             >
                 Login
             </button>

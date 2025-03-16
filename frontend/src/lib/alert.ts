@@ -3,7 +3,7 @@ import { writable } from 'svelte/store';
 type Alert = {
     id: number;
     message: string;
-    color: "bg-red-400" | "bg-green-400";
+    color: "bg-primary-400" | "bg-primary-400";
 };
 
 // Writable store for alerts
@@ -13,11 +13,11 @@ export let alerts = writable<Alert[]>([
 // Add a new alert to the store
 export function addAlert(message: string, type: "success" | "error") {
     const id = Date.now(); // Unique ID based on timestamp
-    let color: "bg-red-400" | "bg-green-400";
+    let color: "bg-primary-400" | "bg-primary-400";
     if (type === "success") {
-        color = "bg-green-400";
+        color = "bg-primary-400";
     } else {
-        color = "bg-red-400";
+        color = "bg-primary-400";
         console.error(message);
     }
     alerts.update((currentAlerts) => [

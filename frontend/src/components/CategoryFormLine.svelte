@@ -1,7 +1,6 @@
 <script lang="ts">
     import { addAlert } from "$lib/alert";
     import { api } from "$lib/auth";
-    import { categories, items } from "$lib/store";
 
     import {
         BanOutline,
@@ -54,7 +53,7 @@
 <div class="m-2">
     {#if editCategory !== category.name}
         <div
-            class="flex ml-2 bg-primaryBg rounded mr-12 p-2"
+            class="flex ml-2 bg-primary-900 rounded mr-12 p-2"
             data-id={category.id}
         >
             <button
@@ -93,10 +92,10 @@
             </div>
         </div>
     {:else}
-        <div class="flex ml-2 bg-primaryBg rounded mr-12 p-2">
+        <div class="flex ml-2 bg-primary-800 rounded mr-12 p-2">
             <input
                 type="text"
-                class="bg-primaryBg border-inputBorderColor rounded-md primaryText w-full h-7"
+                class="bg-primary-700 border-primary-700 rounded-md primaryText w-full h-7"
                 bind:value={editCategoryInput}
                 on:keydown={(e) =>
                     e.key === "Enter" && editCategoryName(category.id)}

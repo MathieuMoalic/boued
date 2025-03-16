@@ -23,7 +23,7 @@
         <Li class="text-lg font-bold flex justify-center items-center" icon>
             <Button
                 size="sm"
-                class="bg-buttonBg w-full m-2 font-semibold"
+                class="bg-primary-700 w-full m-2 font-semibold"
                 on:click={addItemForm}
             >
                 <PlusOutline class="mr-3" />

@@ -14,7 +14,7 @@
     bind:open={$categoryFormOpen}
     size="xs"
     outsideclose
-    class="bg-secondaryBg text-gray-100 rounded-lg"
+    class="bg-gray-800 text-gray-100 rounded-lg"
 >
     <section>
         {#each $categories as category, index (category.order)}
