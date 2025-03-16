@@ -9,10 +9,10 @@
             "sizes": "512x512"
         }
     ],
-    "background_color": "#5f1717",
+    "background_color": "#2f352c",
     "display": "standalone",
     "scope": "/",
-    "theme_color": "#5f1717",
+    "theme_color": "#2f352c",
     "shortcuts": [],
     "description": "Groceries"
 }
