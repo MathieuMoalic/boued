@@ -1,6 +1,6 @@
 [project]
 name = "groceries"
-version = "5.0.14"
+version = "5.0.15"
 description = "Grocery list"
 authors = [{ name = "Mathieu Moalic", email = "matmoa@amu.edu.pl" }]
 license = { file = "LICENSE" }
