@@ -1,4 +1,4 @@
-# 🛒 Groceries App
+# 🛒 Boued
 
 A simple, self-hostable web app to manage groceries and shopping lists, built with a FastAPI backend and a SvelteKit frontend.
 
