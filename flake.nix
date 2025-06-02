@@ -44,7 +44,7 @@
     };
 
     entrypoint = pkgs.writeShellApplication {
-      name = "boued-run";
+      name = "boued";
       runtimeInputs = [pythonEnv];
       text = ''
         export PYTHONPATH=${backend}/backend
@@ -63,7 +63,114 @@
 
     app = {
       type = "app";
-      program = "${entrypoint}/bin/boued-run";
+      program = "${entrypoint}/bin/boued";
+    };
+
+    service = {
+      lib,
+      config,
+      ...
+    }: let
+      cfg = config.services.boued;
+    in {
+      options.services.boued = {
+        enable = lib.mkEnableOption "Boued backend app";
+
+        databaseUrl = lib.mkOption {
+          type = lib.types.str;
+          default = "sqlite:////var/lib/boued/data.db";
+          description = "Database URL used by the Boued backend";
+        };
+
+        port = lib.mkOption {
+          type = lib.types.port;
+          default = 6001;
+          description = "Port the backend server will listen on.";
+        };
+
+        secretKey = lib.mkOption {
+          type = lib.types.str;
+          default = "changeme"; # use sops-nix or env vault in prod
+          description = "JWT secret key used by the backend";
+        };
+
+        admin = {
+          username = lib.mkOption {
+            type = lib.types.str;
+            default = "admin";
+            description = "First admin user name";
+          };
+          password = lib.mkOption {
+            type = lib.types.str;
+            default = "changeme";
+            description = "First admin user password";
+          };
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        users.users.boued = {
+          isSystemUser = true;
+          group = "boued";
+          home = "/var/lib/boued";
+          createHome = true;
+        };
+        users.groups.boued = {};
+
+        systemd.services.boued = {
+          description = "Boued backend service";
+          wantedBy = ["multi-user.target"];
+          after = ["network.target"];
+
+          environment = {
+            DATABASE_URL = cfg.databaseUrl;
+            SECRET_KEY = cfg.secretKey;
+            FIRST_USER_NAME = cfg.admin.username;
+            FIRST_USER_PASSWORD = cfg.admin.password;
+          };
+
+          serviceConfig = {
+            ExecStart = "${entrypoint}/bin/boued";
+            WorkingDirectory = "/var/lib/boued";
+            User = "boued";
+            Group = "boued";
+            StateDirectory = "boued";
+            Restart = "on-failure";
+
+            # Security hardening
+            CapabilityBoundingSet = "";
+            RestrictAddressFamilies = "AF_UNIX AF_INET AF_INET6";
+            SystemCallFilter = "~@clock @cpu-emulation @keyring @module @obsolete @raw-io @reboot @swap @resources @privileged @mount @debug";
+            NoNewPrivileges = "yes";
+            ProtectClock = "yes";
+            ProtectKernelLogs = "yes";
+            ProtectControlGroups = "yes";
+            ProtectKernelModules = "yes";
+            SystemCallArchitectures = "native";
+            RestrictNamespaces = "yes";
+            RestrictSUIDSGID = "yes";
+            ProtectHostname = "yes";
+            ProtectKernelTunables = "yes";
+            RestrictRealtime = "yes";
+            ProtectProc = "invisible";
+            PrivateUsers = "yes";
+            LockPersonality = "yes";
+            UMask = "0077";
+            RemoveIPC = "yes";
+            LimitCORE = "0";
+            ProtectHome = "yes";
+            PrivateTmp = "yes";
+            ProtectSystem = "strict";
+            ProcSubset = "pid";
+            SocketBindAllow = ["tcp:${builtins.toString cfg.port}"];
+            SocketBindDeny = "any";
+
+            LimitNOFILE = 1024;
+            LimitNPROC = 64;
+            MemoryMax = "100M";
+          };
+        };
+      };
     };
   in {
     packages.${system} = {
@@ -72,5 +179,6 @@
     };
     apps.${system}.default = app;
     devShells.${system}.default = shell;
+    nixosModules.pleustradenn-service = service;
   };
 }
