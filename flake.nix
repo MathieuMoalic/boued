@@ -88,10 +88,12 @@
           description = "Port the backend server will listen on.";
         };
 
-        secretKey = lib.mkOption {
-          type = lib.types.str;
-          default = "changeme"; # use sops-nix or env vault in prod
-          description = "JWT secret key used by the backend";
+        secretKeyFile = lib.mkOption {
+          type = lib.types.path;
+          default = "/var/lib/boued/secret.key";
+          description = ''
+            Path to the file containing the JWT secret key used by the backend.
+          '';
         };
 
         admin = {
@@ -124,7 +126,7 @@
 
           environment = {
             DATABASE_URL = cfg.databaseUrl;
-            SECRET_KEY = cfg.secretKey;
+            SECRET_KEY_FILE = cfg.secretKeyFile;
             FIRST_USER_NAME = cfg.admin.username;
             FIRST_USER_PASSWORD = cfg.admin.password;
           };

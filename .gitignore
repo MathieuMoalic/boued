@@ -19,3 +19,4 @@ frontend_old
 /Caddyfile
 *.sqlite
 result
+secret.key
