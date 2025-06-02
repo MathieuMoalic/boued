@@ -3,7 +3,7 @@ from typing import Any
 from sqlmodel import Session, select
 
 from backend.models import User
-from backend.passlib import hash_password
+from backend.mypasslib import hash_password
 
 
 def create_user(session: Session, data: dict[str, Any]) -> User:

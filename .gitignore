@@ -17,3 +17,5 @@ frontend_old
 .svelte-kit
 /data
 /Caddyfile
+*.sqlite
+result

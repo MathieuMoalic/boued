@@ -11,7 +11,7 @@ from backend.crud.items import (
     update_item,
 )
 from backend.database import get_session
-from backend.jwt import get_current_user
+from backend.myjwt import get_current_user
 from backend.schemas.items import (
     ItemCreate,
     ItemRead,

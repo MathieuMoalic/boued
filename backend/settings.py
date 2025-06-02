@@ -1,0 +1,6 @@
+import os
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+FIRST_USER_NAME = os.environ["FIRST_USER_NAME"]
+FIRST_USER_PASSWORD = os.environ["FIRST_USER_PASSWORD"]
+SECRET_KEY = os.environ["SECRET_KEY"]

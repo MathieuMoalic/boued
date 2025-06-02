@@ -9,12 +9,8 @@ from sqlmodel import Session, select
 
 from backend.database import engine
 from backend.models import User
-from backend.passlib import verify_password
-
-if "ADMIN_PASSWORD" not in environ:
-    raise ValueError("No ADMIN_PASSWORD")
-else:
-    SECRET_KEY = environ["ADMIN_PASSWORD"]
+from backend.mypasslib import verify_password
+from backend.settings import SECRET_KEY
 
 ALGORITHM = "HS256"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

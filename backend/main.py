@@ -7,10 +7,10 @@ from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi.staticfiles import StaticFiles
 
-from backend.jwt import jwt_login
 from backend.router.categories import router as categories_router
 from backend.router.items import router as items_router
 from backend.websocket import handle_websocket
+from backend.myjwt import jwt_login
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("database")

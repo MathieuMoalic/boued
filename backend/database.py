@@ -7,7 +7,7 @@ from backend.crud.items import create_item
 from backend.crud.users import create_user
 from backend.models import Category, Item, User
 
-DATABASE_URL = environ["DATABASE_URL"]
+from backend.settings import DATABASE_URL, FIRST_USER_NAME, FIRST_USER_PASSWORD
 
 engine = create_engine(DATABASE_URL, echo=False)  # Disable SQL debug logs
 SQLModel.metadata.create_all(engine)
@@ -23,13 +23,11 @@ def get_session():
 
 with Session(engine) as session:
     if len(session.exec(select(User)).all()) == 0:
-        admin_username = environ.get("ADMIN_USERNAME")
-        admin_password = environ.get("ADMIN_PASSWORD")
-        if admin_username is None or admin_password is None:
+        if FIRST_USER_NAME is None or FIRST_USER_PASSWORD is None:
             raise ValueError(
-                "ADMIN_USERNAME and ADMIN_PASSWORD must be set as environment variables to create the database."
+                "FIRST_USER_NAME and FIRST_USER_PASSWORD must be set as environment variables to create the database."
             )
-        create_user(session, {"username": admin_username, "password": admin_password})
+        create_user(session, {"username": FIRST_USER_NAME, "password": FIRST_USER_PASSWORD})
 
     if len(session.exec(select(Category)).all()) == 0:
         create_category(session, {"name": "Other"})

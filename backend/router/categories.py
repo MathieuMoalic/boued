@@ -11,7 +11,7 @@ from backend.crud.categories import (
     update_category,
 )
 from backend.database import get_session
-from backend.jwt import get_current_user
+from backend.myjwt import get_current_user
 from backend.schemas.categories import CategoryCreate, CategoryRead, CategoryUpdate
 from backend.websocket import ws
 

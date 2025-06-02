@@ -27,16 +27,10 @@ A simple, self-hostable web app to manage groceries and shopping lists, built wi
 
 ## 📦 Deployment
 
-### Using Podman or Docker
+### Using nix
 
 ```bash
-podman run -d --replace \
-	--name groceries \
-	--network groceries-proxy \
-	-v ./groceries:/data \
-	-e ADMIN_USERNAME=${ADMIN_USERNAME} \
-	-e ADMIN_PASSWORD=${ADMIN_PASSWORD} \
-	ghcr.io/mathieumoalic/groceries-app:latest
+nix run .
 ```
 
 ---
@@ -44,7 +38,7 @@ podman run -d --replace \
 ### 🔁 Reverse Proxy (Caddy)
 
 ```Caddyfile
-groceries.example.com {
+boued.example.com {
 	reverse_proxy localhost:6001
 }
 ```
@@ -57,19 +51,3 @@ groceries.example.com {
 - **Frontend**: SvelteKit, TailwindCSS
 - **DB**: SQLite
 - **Auth**: JWT-based
-- **Container**: Docker/Podman-ready
-
----
-
-## 🧪 Development
-
-```bash
-# Backend
-cd backend
-uvicorn main:app --reload
-
-# Frontend
-cd frontend
-npm install
-npm run dev
-```
