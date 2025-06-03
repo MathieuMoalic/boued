@@ -134,7 +134,7 @@
             SECRET_KEY_FILE = cfg.secretKeyFile;
             FIRST_USER_NAME = cfg.admin.username;
             FIRST_USER_PASSWORD = cfg.admin.password;
-            BOUED_PORT = cfg.port;
+            BOUED_PORT = builtins.toString cfg.port;
           };
 
           serviceConfig = {
