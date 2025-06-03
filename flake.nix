@@ -104,12 +104,12 @@
         firstUser = {
           username = lib.mkOption {
             type = lib.types.str;
-            default = "admin";
+            default = "";
             description = "First user username";
           };
           password = lib.mkOption {
             type = lib.types.str;
-            default = "changeme";
+            default = "";
             description = "First user password";
           };
         };
