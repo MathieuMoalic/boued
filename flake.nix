@@ -101,16 +101,16 @@
           '';
         };
 
-        admin = {
+        firstUser = {
           username = lib.mkOption {
             type = lib.types.str;
             default = "admin";
-            description = "First admin user name";
+            description = "First user username";
           };
           password = lib.mkOption {
             type = lib.types.str;
             default = "changeme";
-            description = "First admin user password";
+            description = "First user password";
           };
         };
       };
@@ -132,8 +132,8 @@
           environment = {
             DATABASE_URL = cfg.databaseUrl;
             SECRET_KEY_FILE = cfg.secretKeyFile;
-            FIRST_USER_NAME = cfg.admin.username;
-            FIRST_USER_PASSWORD = cfg.admin.password;
+            FIRST_USER_NAME = cfg.firstUser.username;
+            FIRST_USER_PASSWORD = cfg.firstUser.password;
             BOUED_PORT = builtins.toString cfg.port;
           };
 
