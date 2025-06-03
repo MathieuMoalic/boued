@@ -49,7 +49,12 @@
       text = ''
         export PYTHONPATH=${backend}/backend
         cd ${backend}
-        exec ${pythonEnv}/bin/uvicorn backend.main:app --proxy-headers --host 0.0.0.0 --port 6001
+
+        # If BOUED_PORT is unset, default to 6001
+        export BOUED_PORT="''${BOUED_PORT:-6001}"
+
+        exec ${pythonEnv}/bin/uvicorn backend.main:app \
+             --proxy-headers --host 0.0.0.0 --port "$BOUED_PORT"
       '';
     };
 
@@ -129,6 +134,7 @@
             SECRET_KEY_FILE = cfg.secretKeyFile;
             FIRST_USER_NAME = cfg.admin.username;
             FIRST_USER_PASSWORD = cfg.admin.password;
+            BOUED_PORT = cfg.port;
           };
 
           serviceConfig = {
