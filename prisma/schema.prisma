@@ -1,0 +1,46 @@
+generator client {
+  provider      = "prisma-client-js"
+  output        = "../node_modules/.prisma/client"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id    Int    @id @default(autoincrement())
+  name  String @unique
+  order Int    @unique
+
+  Item Item[]
+}
+
+model Item {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique
+  is_active   Boolean   @default(false)
+  notes       String    @default("")
+  quantity    Float?
+  unit        String    @default("None")
+  category_id Int? // Make category_id nullable
+  category    Category? @relation(fields: [category_id], references: [id])
+}
+
+model User {
+  id            String        @id @default(cuid())
+  username      String        @unique
+  password_hash String
+  language      String        @default("en")
+  UserSession   UserSession[]
+}
+
+model UserSession {
+  id        String   @id @default(cuid()) // Session ID stored in cookie
+  expiresAt DateTime
+  user_id   String
+  user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@index([user_id])
+}

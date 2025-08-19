@@ -1,149 +1,133 @@
 {
-  inputs.nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
+  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
 
   outputs = {nixpkgs, ...}: let
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
+    lib = pkgs.lib;
 
-    pythonPackages = ps:
-      with ps; [
-        fastapi
-        uvicorn
-        sqlmodel
-        websockets
-        pyjwt
-        python-multipart
-        bcrypt
-      ];
-    pythonEnv = pkgs.python313.withPackages pythonPackages;
-
-    frontend = pkgs.buildNpmPackage {
-      pname = "frontend";
-      version = "2.0.0";
-      npmDepsHash = "sha256-yzKB8QQibLu4wUqeBToK/ChVviODBl3AQXrmQ6eh+08=";
-      src = ./frontend;
-      installPhase = ''
-        runHook preInstall
-        cp -r build $out/
-        runHook postInstall
-      '';
+    prismaEnv = {
+      PRISMA_QUERY_ENGINE_LIBRARY = "${pkgs.prisma-engines}/lib/libquery_engine.node";
+      PRISMA_QUERY_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/query-engine";
+      PRISMA_SCHEMA_ENGINE_BINARY = "${pkgs.prisma-engines}/bin/schema-engine";
+      PRISMA_HIDE_UPDATE_MESSAGE = "1";
     };
 
-    backend = pkgs.stdenv.mkDerivation {
-      name = "boued-app";
-      src = pkgs.lib.cleanSource ./backend;
-      buildInputs = [pythonEnv];
+    exportPrismaEnv = lib.concatStringsSep "\n" (
+      map (name: "export ${name}=\"${prismaEnv.${name}}\"")
+      (builtins.attrNames prismaEnv)
+    );
 
-      installPhase = ''
-        mkdir -p $out/backend/static
-        cp -r . $out/backend/
-        cp -r ${frontend}/* $out/backend/static/
-      '';
+    package = pkgs.buildNpmPackage ({
+        pname = "pleustradenn";
+        version = "2.0.0";
+        npmDepsHash = "sha256-qXEb92J1HLkPC6s7zwF+/Z/K1uUGNL8Bha08o8mVd+0=";
+        src = ./.;
+        NODE_ENV = "production";
 
-      meta.mainProgram = "run";
-    };
+        postBuild = ''
+          export HOME=$TMPDIR
+          npx prisma generate --no-hints
+        '';
 
-    entrypoint = pkgs.writeShellApplication {
-      name = "boued";
-      runtimeInputs = [pythonEnv];
-      text = ''
-        export PYTHONPATH=${backend}/backend
-        cd ${backend}
+        installPhase = ''
+          runHook preInstall
+          mkdir -p $out/bin
+          cp -r build prisma package.json node_modules $out/
+          runHook postInstall
+        '';
+      }
+      // prismaEnv);
 
-        # If BOUED_PORT is unset, default to 6001
-        export BOUED_PORT="''${BOUED_PORT:-6001}"
+    startScript = pkgs.writeShellScriptBin "pleustradenn" ''
+      ${exportPrismaEnv}
 
-        exec ${pythonEnv}/bin/uvicorn backend.main:app \
-             --proxy-headers --host 0.0.0.0 --port "$BOUED_PORT"
-      '';
+      if [ -f .env ]; then
+        exec ${pkgs.nodejs}/bin/node --env-file=.env ${package}/build/index.js "$@"
+      else
+        echo "⚠️  .env not found, starting without it"
+        exec ${pkgs.nodejs}/bin/node ${package}/build/index.js "$@"
+      fi
+    '';
+
+    overlay = final: prev: {
+      pleustradenn = package;
     };
 
     shell = pkgs.mkShell {
-      buildInputs = [
-        pythonEnv
-        pkgs.nodejs_24
-        pkgs.sqlite
-      ];
-    };
-
-    app = {
-      type = "app";
-      program = "${entrypoint}/bin/boued";
+      buildInputs = with pkgs; [nodejs sqlite];
+      shellHook = exportPrismaEnv;
     };
 
     service = {
       lib,
       config,
+      pkgs,
+      utils,
       ...
     }: let
-      cfg = config.services.boued;
+      cfg = config.services.pleustradenn;
     in {
-      options.services.boued = {
-        enable = lib.mkEnableOption "Boued backend app";
+      options.services.pleustradenn = {
+        enable = lib.mkEnableOption "Pleustradenn web application";
 
         databaseUrl = lib.mkOption {
           type = lib.types.str;
-          default = "sqlite:////var/lib/boued/data.db";
-          description = "Database URL used by the Boued backend";
+          default = "file:///var/lib/pleustradenn/prod.db";
+          description = "Database connection string.";
+        };
+
+        allowRegistration = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Allow users to self-register.";
         };
 
         port = lib.mkOption {
           type = lib.types.port;
-          default = 6001;
-          description = "Port the backend server will listen on.";
-        };
-
-        secretKeyFile = lib.mkOption {
-          type = lib.types.path;
-          default = "/var/lib/boued/secret.key";
-          description = ''
-            Path to the file containing the JWT secret key used by the backend.
-          '';
-        };
-
-        firstUser = {
-          username = lib.mkOption {
-            type = lib.types.str;
-            default = "";
-            description = "First user username";
-          };
-          password = lib.mkOption {
-            type = lib.types.str;
-            default = "";
-            description = "First user password";
-          };
+          default = 4173;
+          description = "Port the server listens on.";
         };
       };
 
       config = lib.mkIf cfg.enable {
-        users.users.boued = {
+        users.users.pleustradenn = {
           isSystemUser = true;
-          group = "boued";
-          home = "/var/lib/boued";
+          group = "pleustradenn";
+          home = "/var/lib/pleustradenn";
           createHome = true;
         };
-        users.groups.boued = {};
+        users.groups.pleustradenn = {};
 
-        systemd.services.boued = {
-          description = "Boued backend service";
-          wantedBy = ["multi-user.target"];
+        systemd.services.pleustradenn = {
+          description = "Pleustradenn web application";
           after = ["network.target"];
+          wantedBy = ["multi-user.target"];
 
-          environment = {
-            DATABASE_URL = cfg.databaseUrl;
-            SECRET_KEY_FILE = cfg.secretKeyFile;
-            FIRST_USER_NAME = cfg.firstUser.username;
-            FIRST_USER_PASSWORD = cfg.firstUser.password;
-            BOUED_PORT = builtins.toString cfg.port;
-          };
+          environment =
+            prismaEnv
+            // {
+              DATABASE_URL = cfg.databaseUrl;
+              ALLOW_REGISTRATION = lib.boolToString cfg.allowRegistration;
+              PORT = builtins.toString cfg.port;
+            };
 
           serviceConfig = {
-            ExecStart = "${entrypoint}/bin/boued";
-            WorkingDirectory = "/var/lib/boued";
-            User = "boued";
-            Group = "boued";
-            StateDirectory = "boued";
-            Restart = "on-failure";
+            ExecStartPre = pkgs.writeShellScript "run-prisma-migrate-deploy" ''
+              export DATABASE_URL="${cfg.databaseUrl}"
+              ${exportPrismaEnv}
+
+              ${package}/node_modules/.bin/prisma migrate deploy --schema ${package}/prisma/schema.prisma
+            '';
+
+            ExecStart = utils.escapeSystemdExecArgs [
+              "${pkgs.nodejs}/bin/node"
+              "${package}/build/index.js"
+            ];
+            WorkingDirectory = "/var/lib/pleustradenn";
+            User = "pleustradenn";
+            Group = "pleustradenn";
+            StateDirectory = "pleustradenn";
 
             # Security hardening
             CapabilityBoundingSet = "";
@@ -180,13 +164,16 @@
         };
       };
     };
-  in {
-    packages.${system} = {
-      frontend = frontend;
-      default = backend;
+
+    app = {
+      type = "app";
+      program = "${startScript}/bin/pleustradenn";
     };
+  in {
+    packages.${system}.default = package;
     apps.${system}.default = app;
     devShells.${system}.default = shell;
+    overlays.default = overlay;
     nixosModules.pleustradenn-service = service;
   };
 }
