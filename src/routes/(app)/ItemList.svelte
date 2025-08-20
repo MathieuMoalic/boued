@@ -9,7 +9,7 @@
     export let toggleCategory: (id: number | null) => void;
 </script>
 
-{#if items.some((item) => item.category_id === category.id)}
+{#if items.some((item) => item.category_id === category.id && item.is_active)}
     <li class="block">
         <button
             on:click={() => toggleCategory(category.id)}
@@ -28,7 +28,7 @@
         </button>
 
         {#each items as item}
-            {#if item.category_id === category.id && !collapsed.includes(category.id)}
+            {#if item.category_id === category.id && !collapsed.includes(category.id) && item.is_active}
                 <div class="ml-3">
                     <li class="m-0 flex justify-between items-center">
                         <div

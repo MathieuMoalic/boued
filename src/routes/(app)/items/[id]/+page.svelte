@@ -20,4 +20,4 @@
 	let categories = data.categories;
 </script>
 
-<ItemForm {item} {categories} />
+<ItemForm {item} {categories} mode="edit" />

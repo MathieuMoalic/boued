@@ -69,6 +69,8 @@ export const actions: Actions = {
                 category_id: itemCategoryId,
                 quantity: itemQuantity,
                 unit: itemUnit,
+                is_active: true,
+                notes: form.get('notes')?.toString() ?? "",
             }
         });
         return { success: true, message: `${item.name} created successfully.` };

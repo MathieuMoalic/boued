@@ -4,7 +4,6 @@
 
 <svg
     class={`animate-spin text-gray-500 ${className}`}
-    xmlns="http://www.w3.org/2000/svg"
     fill="none"
     viewBox="0 0 24 24"
 >

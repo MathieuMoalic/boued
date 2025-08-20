@@ -4,6 +4,7 @@
     import Plus from "$icons/Plus.svelte";
     import Spinner from "$icons/Spinner.svelte";
     import { addAlert } from "$lib/client/alert";
+    import { searchTerm } from "$lib/client/store";
     import type { SubmitFunction } from "@sveltejs/kit";
 
     export let item: {
@@ -19,6 +20,7 @@
                     if (result.data && result.data.item) {
                         item = result.data.item;
                     }
+                    $searchTerm = "";
                     break;
                 }
                 case "failure": {

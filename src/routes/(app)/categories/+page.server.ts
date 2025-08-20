@@ -6,27 +6,17 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     if (!locals.user) {
         throw redirect(303, `/login?redirectTo=${url.pathname}`);
     }
-    // Always fetch categories sorted by their intended order
     const categories = await prisma.category.findMany({
         orderBy: { order: 'asc' }
     });
-    // The original fail condition was on !categories, but findMany returns an array,
-    // so it will never be falsy. An empty array is a valid state.
     return { categories };
 };
 
-/**
- * Re-indexes all categories to ensure their 'order' field is a successive sequence (1, 2, 3, ...).
- * This should be called after a category is deleted.
- */
 async function reorderCategories() {
-    // 1. Fetch all categories, sorted by their current order.
     const categories = await prisma.category.findMany({
         orderBy: { order: 'asc' }
     });
 
-    // 2. Create an array of update promises.
-    // Each category's new order is its index in the sorted array + 1.
     const updatePromises = categories.map((category, index) =>
         prisma.category.update({
             where: { id: category.id },
@@ -34,7 +24,6 @@ async function reorderCategories() {
         })
     );
 
-    // 3. Execute all updates in a single transaction for efficiency and data integrity.
     await prisma.$transaction(updatePromises);
 }
 
@@ -74,7 +63,7 @@ export const actions: Actions = {
             return fail(401, { error: 'You must be logged in to delete a category.' });
         }
         const form = await request.formData();
-        const categoryIdString = form.get('id')?.toString(); // It's better to delete by a unique, non-changing ID.
+        const categoryIdString = form.get('id')?.toString();
         if (!categoryIdString) {
             return fail(400, { error: 'Category ID is missing.' });
         }
@@ -90,18 +79,15 @@ export const actions: Actions = {
             return fail(404, { error: 'Category not found.' });
         }
 
-        // Disassociate items before deleting the category
         await prisma.item.updateMany({
             where: { category_id: category.id },
             data: { category_id: null }
         });
 
-        // Now delete the category
         await prisma.category.delete({
             where: { id: categoryId }
         });
 
-        // CRITICAL STEP: Re-order all remaining categories to fill the gap.
         await reorderCategories();
 
         const categories = await prisma.category.findMany();
@@ -123,11 +109,10 @@ export const actions: Actions = {
             return fail(400, { error: 'Invalid category ID.' });
         }
 
-        // Check if the new name is already in use by another category
         const duplicate = await prisma.category.findFirst({
             where: {
                 name: newName,
-                id: { not: categoryId } // Exclude the current category from the check
+                id: { not: categoryId }
             }
         });
         if (duplicate) {

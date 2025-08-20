@@ -10,61 +10,27 @@
     import { enhance } from "$app/forms";
     import type { SubmitFunction } from "@sveltejs/kit";
     import { addAlert } from "$lib/client/alert";
+    import Undo from "$icons/Undo.svelte";
     export let data: PageData;
     let categories = data.categories;
-    let editCategory = "";
-    let editCategoryInput = "";
+    let editCategory = "AA";
+    let editCategoryInput = "AA";
     let newCategoryInput = "";
 
-    const handleEnhance: SubmitFunction = ({ submitter }) => {
+    const handleEnhance: SubmitFunction = () => {
         return async ({ result }) => {
-            const action = submitter?.getAttribute("formaction");
             switch (result.type) {
                 case "success": {
-                    if (action?.includes("create")) {
-                        // addAlert(
-                        //     `Category '${newCategoryInput}' created successfully`,
-                        //     "success",
-                        // );
-                        if (result.data && result.data.categories) {
-                            categories = result.data.categories;
-                        }
-                        editCategory = "";
-                        editCategoryInput = "";
-                        newCategoryInput = "";
-                    } else if (action?.includes("delete")) {
-                        // addAlert(
-                        //     `Category '${editCategory}' deleted successfully`,
-                        //     "success",
-                        // );
-                        if (result.data && result.data.categories) {
-                            console.log(
-                                "Categories after deletion:",
-                                result.data.categories,
-                            );
-                            categories = result.data.categories;
-                        }
-                        editCategory = "";
-                        editCategoryInput = "";
-                    } else if (action?.includes("rename")) {
-                        // addAlert(
-                        //     `Category '${editCategory}' renamed to '${editCategoryInput}' successfully`,
-                        //     "success",
-                        // );
-                        if (result.data && result.data.categories) {
-                            categories = result.data.categories;
-                        }
-                        editCategory = "";
-                        editCategoryInput = "";
-                    } else {
-                        addAlert("Action completed successfully", "success");
+                    if (result.data && result.data.categories) {
+                        categories = result.data.categories;
                     }
+                    editCategory = "";
+                    editCategoryInput = "";
+                    newCategoryInput = "";
                     break;
                 }
-                // if server returns`fail(...)`
                 case "failure": {
                     addAlert(result.data?.error ?? "Unknown error", "error");
-
                     break;
                 }
             }
@@ -77,10 +43,12 @@
     use:enhance={handleEnhance}
     class="flex items-center space-x-2 mb-4 w-full"
 >
-    <section class="p-4">
+    <section class="p-4 w-full">
         <h1 class="text-2xl text-primary-200 font-bold mb-4">Categories</h1>
         {#each categories as category (category.id)}
-            <div class="flex items-center bg-primary-900 rounded p-2 mb-4">
+            <div
+                class="flex items-center bg-primary-900 rounded p-2 mb-4 h-10 w-full"
+            >
                 {#if editCategory !== category.name}
                     <div class="flex items-center w-full">
                         <button
@@ -97,10 +65,14 @@
                         </div>
                         <div class="ml-auto flex items-center space-x-2">
                             <button>
-                                <CaretUpSolid color="green" />
+                                <CaretUpSolid
+                                    className="w-6 h-6 text-green-600"
+                                />
                             </button>
                             <button>
-                                <CaretDownSolid color="red" />
+                                <CaretDownSolid
+                                    className="w-6 h-6 text-red-500"
+                                />
                             </button>
                             <button
                                 on:click={() => {
@@ -114,32 +86,31 @@
                         </div>
                     </div>
                 {:else}
-                    <div
-                        class="flex items-center w-full bg-primary-800 p-2 rounded"
+                    <input
+                        type="text"
+                        class="bg-primary-700 text-primary-200 border border-primary-700 rounded-md w-full p-2 h-6"
+                        bind:value={editCategoryInput}
+                        name="new-name"
+                    />
+                    <button
+                        class="ml-2 p-2"
+                        on:click={() => {
+                            editCategory = "";
+                            editCategoryInput = "";
+                        }}
+                        type="button"
                     >
-                        <input
-                            type="text"
-                            class="bg-primary-700 text-primary-200 border border-primary-700 rounded-md w-full p-2"
-                            bind:value={editCategoryInput}
-                            name="new-name"
-                        />
-                        <button
-                            class="ml-2 p-2"
-                            on:click={() => {
-                                editCategory = "";
-                                editCategoryInput = "";
-                            }}
-                            formaction="?/rename"
-                            type="submit"
-                            name="old-name"
-                            value={category.name}
-                        >
-                            <Ban color="red" />
-                        </button>
-                        <button class="ml-2 p-2">
-                            <Check color="green" />
-                        </button>
-                    </div>
+                        <Undo className="w-6 h-6 text-red-500" />
+                    </button>
+                    <button
+                        class="ml-2 p-2"
+                        formaction="?/rename"
+                        type="submit"
+                        name="id"
+                        value={category.id}
+                    >
+                        <Check className="w-6 h-6 text-green-500" />
+                    </button>
                 {/if}
             </div>
         {/each}

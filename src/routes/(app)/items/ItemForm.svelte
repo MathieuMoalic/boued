@@ -6,6 +6,8 @@
     import type { SubmitFunction } from "@sveltejs/kit";
     import { addAlert } from "$lib/client/alert";
     import { goto } from "$app/navigation";
+    import Edit from "$icons/Edit.svelte";
+    import { searchTerm } from "$lib/client/store";
     export let item: {
         name: string;
         quantity: number;
@@ -30,6 +32,7 @@
                         result.data?.message ?? "Action completed successfully",
                         "success",
                     );
+                    $searchTerm = "";
                     goto("/");
                     break;
                 }
@@ -60,6 +63,7 @@
             <span>Quantity</span>
             <div class="flex items-center space-x-2">
                 <button
+                    type="button"
                     on:click={() =>
                         (item.quantity = Math.max(0, (item.quantity ?? 0) - 1))}
                     class="flex items-center justify-center px-3 py-1 bg-primary-700 hover:bg-primary-600 text-primary-200 rounded w-14 h-10"
@@ -73,6 +77,7 @@
                     placeholder="Enter quantity"
                 />
                 <button
+                    type="button"
                     on:click={() => (item.quantity = (item.quantity ?? 0) + 1)}
                     class="flex items-center justify-center px-3 py-1 bg-primary-800 hover:bg-primary-700 text-primary-200 rounded w-14 h-10"
                 >
@@ -143,6 +148,13 @@
                         </span>
                     </label>
                 {/each}
+                <label
+                    class="inline-flex items-center justify-center p-1 cursor-pointer rounded text-primary-200 max-w-[120px] truncate bg-primary-800 hover:bg-primary-700"
+                >
+                    <button on:click={() => goto("/categories")}>
+                        <Edit className="h-5 w-5" />
+                    </button>
+                </label>
             </div>
         </div>
 
