@@ -7,7 +7,7 @@
     let item = {
         name: $searchTerm,
         quantity: 0,
-        unit: "pcs",
+        unit: "None",
         category_id: null,
         notes: "",
     };

@@ -24,7 +24,7 @@ model Item {
   notes       String    @default("")
   quantity    Float?
   unit        String    @default("None")
-  category_id Int? // Make category_id nullable
+  category_id Int?
   category    Category? @relation(fields: [category_id], references: [id])
 }
 
@@ -37,7 +37,7 @@ model User {
 }
 
 model UserSession {
-  id        String   @id @default(cuid()) // Session ID stored in cookie
+  id        String   @id @default(cuid())
   expiresAt DateTime
   user_id   String
   user      User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
