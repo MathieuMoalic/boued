@@ -12,6 +12,39 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     return { categories };
 };
 
+
+// Put this near your other helpers
+async function reorderCategoriesSafe() {
+    await prisma.$transaction(async (tx) => {
+        // Get categories in a stable order
+        const categories = await tx.category.findMany({
+            orderBy: [{ order: 'asc' }, { id: 'asc' }],
+            select: { id: true }
+        });
+
+        if (categories.length === 0) return;
+
+        const { _max } = await tx.category.aggregate({ _max: { order: true } });
+        const base = (_max.order ?? 0) + 1; // guaranteed free range start
+
+        // Phase 1: move everything into a disjoint temp range (all unique)
+        for (let i = 0; i < categories.length; i++) {
+            await tx.category.update({
+                where: { id: categories[i].id },
+                data: { order: base + i }
+            });
+        }
+
+        // Phase 2: renumber 1..n (final positions)
+        for (let i = 0; i < categories.length; i++) {
+            await tx.category.update({
+                where: { id: categories[i].id },
+                data: { order: i + 1 }
+            });
+        }
+    });
+}
+
 async function reorderCategories() {
     const categories = await prisma.category.findMany({
         orderBy: { order: 'asc' }
@@ -125,5 +158,100 @@ export const actions: Actions = {
         });
         const categories = await prisma.category.findMany();
         return { success: true, categories: categories }
+    },
+
+    moveup: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to move a category.' });
+        }
+        const form = await request.formData();
+        const categoryIdString = form.get('id')?.toString();
+        if (!categoryIdString) {
+            return fail(400, { error: 'Category ID is missing.' });
+        }
+        const categoryId = parseInt(categoryIdString, 10);
+        if (isNaN(categoryId)) {
+            return fail(400, { error: 'Invalid category ID.' });
+        }
+
+        const category = await prisma.category.findUnique({ where: { id: categoryId } });
+        if (!category) return fail(404, { error: 'Category not found.' });
+
+        const previousCategory = await prisma.category.findFirst({
+            where: { order: category.order - 1 }
+        });
+        if (!previousCategory) {
+            const categories = await prisma.category.findMany({ orderBy: { order: 'asc' } });
+            return { success: true, categories }; // already at top
+        }
+
+        await prisma.$transaction(async (tx) => {
+            const { _max } = await tx.category.aggregate({ _max: { order: true } });
+            const temp = (_max.order ?? 0) + 1;
+
+            // Move current to a free temp slot, then swap
+            await tx.category.update({ where: { id: category.id }, data: { order: temp } });
+            await tx.category.update({
+                where: { id: previousCategory.id },
+                data: { order: category.order }
+            });
+            await tx.category.update({
+                where: { id: category.id },
+                data: { order: previousCategory.order }
+            });
+        });
+
+        // no need to reindex, but it doesn't hurt to keep things tight:
+        await reorderCategoriesSafe();
+
+        const categories = await prisma.category.findMany({ orderBy: { order: 'asc' } });
+        return { success: true, categories };
+    },
+
+    movedown: async ({ request, locals }) => {
+        if (!locals.user) {
+            return fail(401, { error: 'You must be logged in to move a category.' });
+        }
+        const form = await request.formData();
+        const categoryIdString = form.get('id')?.toString();
+        if (!categoryIdString) {
+            return fail(400, { error: 'Category ID is missing.' });
+        }
+        const categoryId = parseInt(categoryIdString, 10);
+        if (isNaN(categoryId)) {
+            return fail(400, { error: 'Invalid category ID.' });
+        }
+
+        // inside actions.movedown (mirror of moveup)
+        const category = await prisma.category.findUnique({ where: { id: categoryId } });
+        if (!category) return fail(404, { error: 'Category not found.' });
+
+        const nextCategory = await prisma.category.findFirst({
+            where: { order: category.order + 1 }
+        });
+        if (!nextCategory) {
+            const categories = await prisma.category.findMany({ orderBy: { order: 'asc' } });
+            return { success: true, categories }; // already at bottom
+        }
+
+        await prisma.$transaction(async (tx) => {
+            const { _max } = await tx.category.aggregate({ _max: { order: true } });
+            const temp = (_max.order ?? 0) + 1;
+
+            await tx.category.update({ where: { id: category.id }, data: { order: temp } });
+            await tx.category.update({
+                where: { id: nextCategory.id },
+                data: { order: category.order }
+            });
+            await tx.category.update({
+                where: { id: category.id },
+                data: { order: nextCategory.order }
+            });
+        });
+
+        await reorderCategoriesSafe();
+
+        const categories = await prisma.category.findMany({ orderBy: { order: 'asc' } });
+        return { success: true, categories };
     }
 };

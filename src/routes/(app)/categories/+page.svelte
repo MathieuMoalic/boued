@@ -6,15 +6,16 @@
     import CaretUpSolid from "$icons/CaretUpSolid.svelte";
     import Close from "$icons/Close.svelte";
     import Check from "$icons/Check.svelte";
-    import Ban from "$icons/Ban.svelte";
     import { enhance } from "$app/forms";
     import type { SubmitFunction } from "@sveltejs/kit";
     import { addAlert } from "$lib/client/alert";
     import Undo from "$icons/Undo.svelte";
+    import Navbar from "../Navbar.svelte";
+
     export let data: PageData;
     let categories = data.categories;
-    let editCategory = "AA";
-    let editCategoryInput = "AA";
+    let editCategory = "";
+    let editCategoryInput = "";
     let newCategoryInput = "";
 
     const handleEnhance: SubmitFunction = () => {
@@ -38,6 +39,7 @@
     };
 </script>
 
+<Navbar />
 <form
     method="POST"
     use:enhance={handleEnhance}
@@ -45,7 +47,7 @@
 >
     <section class="p-4 w-full">
         <h1 class="text-2xl text-primary-200 font-bold mb-4">Categories</h1>
-        {#each categories as category (category.id)}
+        {#each categories as category, i (category.id)}
             <div
                 class="flex items-center bg-primary-900 rounded p-2 mb-4 h-10 w-full"
             >
@@ -60,20 +62,46 @@
                         >
                             <Close />
                         </button>
+
                         <div class="ml-3 text-primary-200 text-lg">
                             {category.name}
                         </div>
+
                         <div class="ml-auto flex items-center space-x-2">
-                            <button>
+                            <!-- UP -->
+                            <button
+                                formaction="?/moveup"
+                                type="submit"
+                                name="id"
+                                value={category.id}
+                                disabled={i === 0}
+                                aria-disabled={i === 0}
+                                class="disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={i === 0 ? "Already first" : "Move up"}
+                            >
                                 <CaretUpSolid
-                                    className="w-6 h-6 text-green-600"
+                                    className={`w-6 h-6 ${i === 0 ? "text-gray-500" : "text-green-600"}`}
                                 />
                             </button>
-                            <button>
+
+                            <!-- DOWN -->
+                            <button
+                                formaction="?/movedown"
+                                type="submit"
+                                name="id"
+                                value={category.id}
+                                disabled={i === categories.length - 1}
+                                aria-disabled={i === categories.length - 1}
+                                class="disabled:opacity-50 disabled:cursor-not-allowed"
+                                title={i === categories.length - 1
+                                    ? "Already last"
+                                    : "Move down"}
+                            >
                                 <CaretDownSolid
-                                    className="w-6 h-6 text-red-500"
+                                    className={`w-6 h-6 ${i === categories.length - 1 ? "text-gray-500" : "text-red-500"}`}
                                 />
                             </button>
+
                             <button
                                 on:click={() => {
                                     editCategory = category.name;
@@ -86,6 +114,7 @@
                         </div>
                     </div>
                 {:else}
+                    <!-- your edit UI unchanged -->
                     <input
                         type="text"
                         class="bg-primary-700 text-primary-200 border border-primary-700 rounded-md w-full p-2 h-6"
@@ -114,6 +143,7 @@
                 {/if}
             </div>
         {/each}
+
         <div class="flex items-center space-x-2 mb-4 w-full">
             <input
                 placeholder="Add category"
