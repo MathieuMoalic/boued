@@ -6,12 +6,13 @@
             href="/"
             rel="home"
             class="font-bold tracking-tight flex items-center text-primary-100"
-            ><img
+        >
+            <img
                 src="/icon-512x512.png"
                 alt="MyApp Logo"
                 class="h-8 w-8 rounded-full mr-4"
             />
-            Home</a
-        >
+            Home
+        </a>
     </div>
 </nav>

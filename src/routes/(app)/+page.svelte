@@ -1,30 +1,24 @@
 <script lang="ts">
 	import { goto } from "$app/navigation";
-	import Edit from "$icons/Edit.svelte";
 	import Plus from "$icons/Plus.svelte";
 	import Search from "./Search.svelte";
-	import ToggleActive from "./ToggleActive.svelte";
 	import ItemList from "./ItemList.svelte";
 	import { searchTerm } from "$lib/client/store";
 	import type { PageData } from "./$types";
 	import fuzzysort from "fuzzysort";
-	import { derived } from "svelte/store";
 	import ItemRow from "./ItemRow.svelte";
 
 	export let data: PageData;
 
-	let { categories, items } = data;
+	let items = data.items;
+	let categories = data.categories;
+	$: ({ items, categories } = data);
 
-	const matched = derived([searchTerm], ([$searchTerm]) =>
-		$searchTerm
-			? fuzzysort
-					.go($searchTerm, items, {
-						keys: ["name"],
-						threshold: -10000,
-					})
-					.map((r) => r.obj)
-			: items,
-	);
+	$: filtered = $searchTerm
+		? fuzzysort
+				.go($searchTerm, items, { keys: ["name"], threshold: -10000 })
+				.map((r) => r.obj)
+		: items;
 
 	let collapsed: (number | null)[] = [];
 
@@ -50,8 +44,8 @@
 		</button>
 
 		<ul class="text-gray-200">
-			{#each $matched as item}
-				<ItemRow {item} />
+			{#each filtered as item}
+				<ItemRow bind:item />
 			{/each}
 		</ul>
 	{:else}

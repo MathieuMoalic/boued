@@ -1,5 +1,6 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
+    import { invalidate } from "$app/navigation";
     import Close from "$icons/Close.svelte";
     import Plus from "$icons/Plus.svelte";
     import Spinner from "$icons/Spinner.svelte";
@@ -7,19 +8,17 @@
     import { searchTerm } from "$lib/client/store";
     import type { SubmitFunction } from "@sveltejs/kit";
 
-    export let item: {
-        id: number;
-        is_active: boolean;
-    };
+    export let item: { id: number; is_active: boolean };
 
     let loading = false;
+
     const handleEnhance: SubmitFunction = () => {
+        loading = true;
         return async ({ result }) => {
+            loading = false;
             switch (result.type) {
                 case "success": {
-                    if (result.data && result.data.item) {
-                        item = result.data.item;
-                    }
+                    await invalidate("app:items");
                     $searchTerm = "";
                     break;
                 }

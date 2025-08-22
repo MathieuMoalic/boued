@@ -2,10 +2,12 @@ import type { Actions, PageServerLoad } from './$types';
 import { fail, redirect } from '@sveltejs/kit';
 import prisma from '$lib/server/prisma';
 
-export const load: PageServerLoad = async ({ locals, url }) => {
+export const load: PageServerLoad = async ({ locals, url, depends }) => {
     if (!locals.user) {
         throw redirect(303, `/login?redirectTo=${url.pathname}`);
     }
+    depends('app:items');
+
     const items = await prisma.item.findMany({});
     const categories = await prisma.category.findMany();
     return { items, categories };
@@ -17,6 +19,7 @@ export const actions: Actions = {
         if (!locals.user) {
             return fail(401, { error: "You must be logged in to toggle an item." });
         }
+
         const form = await request.formData();
         const itemIdString = form.get("id")?.toString();
         if (!itemIdString) {

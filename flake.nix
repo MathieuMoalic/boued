@@ -21,7 +21,7 @@
     package = pkgs.buildNpmPackage ({
         pname = "pleustradenn";
         version = "2.0.0";
-        npmDepsHash = "sha256-qXEb92J1HLkPC6s7zwF+/Z/K1uUGNL8Bha08o8mVd+0=";
+        npmDepsHash = "sha256-lVP4mnUBSj72MEtIJpE1/etS+BDbYIHLeQzpjccjrII=";
         src = ./.;
         NODE_ENV = "production";
 
