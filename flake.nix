@@ -19,7 +19,7 @@
     );
 
     package = pkgs.buildNpmPackage ({
-        pname = "pleustradenn";
+        pname = "boued";
         version = "2.0.0";
         npmDepsHash = "sha256-lVP4mnUBSj72MEtIJpE1/etS+BDbYIHLeQzpjccjrII=";
         src = ./.;
@@ -39,7 +39,7 @@
       }
       // prismaEnv);
 
-    startScript = pkgs.writeShellScriptBin "pleustradenn" ''
+    startScript = pkgs.writeShellScriptBin "boued" ''
       ${exportPrismaEnv}
 
       if [ -f .env ]; then
@@ -51,7 +51,7 @@
     '';
 
     overlay = final: prev: {
-      pleustradenn = package;
+      boued = package;
     };
 
     shell = pkgs.mkShell {
@@ -66,14 +66,14 @@
       utils,
       ...
     }: let
-      cfg = config.services.pleustradenn;
+      cfg = config.services.boued;
     in {
-      options.services.pleustradenn = {
-        enable = lib.mkEnableOption "Pleustradenn web application";
+      options.services.boued = {
+        enable = lib.mkEnableOption "boued web application";
 
         databaseUrl = lib.mkOption {
           type = lib.types.str;
-          default = "file:///var/lib/pleustradenn/prod.db";
+          default = "file:///var/lib/boued/prod.db";
           description = "Database connection string.";
         };
 
@@ -91,16 +91,16 @@
       };
 
       config = lib.mkIf cfg.enable {
-        users.users.pleustradenn = {
+        users.users.boued = {
           isSystemUser = true;
-          group = "pleustradenn";
-          home = "/var/lib/pleustradenn";
+          group = "boued";
+          home = "/var/lib/boued";
           createHome = true;
         };
-        users.groups.pleustradenn = {};
+        users.groups.boued = {};
 
-        systemd.services.pleustradenn = {
-          description = "Pleustradenn web application";
+        systemd.services.boued = {
+          description = "boued web application";
           after = ["network.target"];
           wantedBy = ["multi-user.target"];
 
@@ -124,10 +124,10 @@
               "${pkgs.nodejs}/bin/node"
               "${package}/build/index.js"
             ];
-            WorkingDirectory = "/var/lib/pleustradenn";
-            User = "pleustradenn";
-            Group = "pleustradenn";
-            StateDirectory = "pleustradenn";
+            WorkingDirectory = "/var/lib/boued";
+            User = "boued";
+            Group = "boued";
+            StateDirectory = "boued";
 
             # Security hardening
             CapabilityBoundingSet = "";
@@ -167,13 +167,13 @@
 
     app = {
       type = "app";
-      program = "${startScript}/bin/pleustradenn";
+      program = "${startScript}/bin/boued";
     };
   in {
     packages.${system}.default = package;
     apps.${system}.default = app;
     devShells.${system}.default = shell;
     overlays.default = overlay;
-    nixosModules.pleustradenn-service = service;
+    nixosModules.boued-service = service;
   };
 }
