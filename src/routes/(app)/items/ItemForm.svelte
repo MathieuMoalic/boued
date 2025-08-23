@@ -29,10 +29,6 @@
         return async ({ result }) => {
             switch (result.type) {
                 case "success": {
-                    addAlert(
-                        result.data?.message ?? "Action completed successfully",
-                        "success",
-                    );
                     $searchTerm = "";
                     goto("/");
                     break;

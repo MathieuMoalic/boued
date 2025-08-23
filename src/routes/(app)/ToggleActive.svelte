@@ -1,6 +1,6 @@
 <script lang="ts">
     import { enhance } from "$app/forms";
-    import { invalidate } from "$app/navigation";
+    import { goto, invalidate } from "$app/navigation";
     import Close from "$icons/Close.svelte";
     import Plus from "$icons/Plus.svelte";
     import Spinner from "$icons/Spinner.svelte";
@@ -19,6 +19,10 @@
             switch (result.type) {
                 case "success": {
                     await invalidate("app:items");
+                    let item = result.data?.item;
+                    if (item.is_active === true) {
+                        goto(`/items/${item.id}`);
+                    }
                     $searchTerm = "";
                     break;
                 }
