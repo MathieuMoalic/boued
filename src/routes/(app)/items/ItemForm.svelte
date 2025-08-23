@@ -8,7 +8,6 @@
     import { goto } from "$app/navigation";
     import Edit from "$icons/Edit.svelte";
     import { searchTerm } from "$lib/client/store";
-    import Navbar from "../Navbar.svelte";
     export let item: {
         name: string;
         quantity: number;
@@ -42,11 +41,10 @@
     };
 </script>
 
-<Navbar />
 <form method="POST" use:enhance={handleEnhance}>
-    <main class="flex flex-col space-y-4 p-4 text-primary-200">
-        <label class="space-y-1 text-sm text-primary-200">
-            <span>Name</span>
+    <main class="flex flex-col space-y-4 p-4 pt-2.5 text-primary-200">
+        <label class="space-y-1 text-sm text-primary-200 pr-10">
+            <!-- <span>Name</span> -->
             <input
                 type="text"
                 name="name"

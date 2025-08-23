@@ -2,7 +2,7 @@
     import { searchTerm } from "$lib/client/store";
 </script>
 
-<div class="m-0 p-2">
+<div class="m-0 p-2 pr-12">
     <input
         type="text"
         placeholder="Search or Add items..."

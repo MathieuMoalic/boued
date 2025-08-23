@@ -10,7 +10,6 @@
     import type { SubmitFunction } from "@sveltejs/kit";
     import { addAlert } from "$lib/client/alert";
     import Undo from "$icons/Undo.svelte";
-    import Navbar from "../Navbar.svelte";
 
     export let data: PageData;
     let categories = data.categories;
@@ -39,7 +38,6 @@
     };
 </script>
 
-<Navbar />
 <form
     method="POST"
     use:enhance={handleEnhance}
