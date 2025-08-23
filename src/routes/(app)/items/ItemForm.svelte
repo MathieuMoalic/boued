@@ -149,7 +149,7 @@
                 <label
                     class="inline-flex items-center justify-center p-1 cursor-pointer rounded text-primary-200 max-w-[120px] truncate bg-primary-800 hover:bg-primary-700"
                 >
-                    <button on:click={() => goto("/categories")}>
+                    <button type="button" on:click={() => goto("/categories")}>
                         <Edit className="h-5 w-5" />
                     </button>
                 </label>
