@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { onMount } from "svelte";
 	import { goto } from "$app/navigation";
 	import Plus from "$icons/Plus.svelte";
 	import Search from "./Search.svelte";
@@ -21,6 +22,28 @@
 		: items;
 
 	let collapsed: (number | null)[] = [];
+
+	// Load persisted state on the client
+	onMount(() => {
+		try {
+			const raw = localStorage.getItem("collapsedCategories");
+			if (raw) {
+				const parsed = JSON.parse(raw);
+				if (Array.isArray(parsed)) {
+					// (optional) keep only ids that still exist (+ null for "Other")
+					const valid = new Set<number | null>([
+						null,
+						...categories.map((c) => c.id),
+					]);
+					collapsed = parsed
+						.filter((id) => id === null || typeof id === "number")
+						.filter((id) => valid.has(id));
+				}
+			}
+		} catch {
+			// ignore malformed storage
+		}
+	});
 
 	function toggleCategory(catId: number | null) {
 		if (collapsed.includes(catId)) {
