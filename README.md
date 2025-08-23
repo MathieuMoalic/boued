@@ -1,53 +1,119 @@
-# 🛒 Boued
+# Boued
 
-A simple, self-hostable web app to manage groceries and shopping lists, built with a FastAPI backend and a SvelteKit frontend.
+A small, self-hostable web app to manage groceries and shopping lists — built with **SvelteKit**, **TypeScript**, **Prisma**, **SQLite (by default)**, TailwindCSS, Vite, and a Nix flake for reproducible dev. ([GitHub][1])
 
-![App Preview](./screenshots.png)
+![Screenshots](./screenshots.png) ([GitHub][1])
 
----
+## Features
 
-## 🧰 Features
+* Fast, minimal grocery list management
+* Add/mark items, quick search, and lightweight categorization
+* Keyboard-friendly UI
+* Works great locally or behind a home server reverse proxy
+* SQLite out of the box; switchable to other databases via Prisma
 
-- Real-time grocery list management
-- Item categories and notes
-- Search and toggle active/inactive items
-- WebSocket-based sync
-- Authenticated access
-- SvelteKit + FastAPI + SQLite
+## Tech stack
 
----
+* **Frontend/Server**: SvelteKit + Vite + TypeScript
+* **ORM & DB**: Prisma with a default SQLite DB
+* **Styling**: TailwindCSS
+* **Dev env**: Nix flake
 
-## 🧱 Project Structure
+## Quick start
 
-- `backend/`: FastAPI backend, models, routes, and WebSocket
-- `frontend/`: SvelteKit app
-- REST API exposed under `/api`
+### 1) Clone
 
----
+```bash
+git clone https://github.com/MathieuMoalic/boued
+cd boued
+```
 
-## 📦 Deployment
+### 2) Configure environment
 
-### Using nix
+Create a `.env` file in the repo root:
+
+```ini
+# Prisma connection string (SQLite by default)
+DATABASE_URL="file:./dev.db"
+
+# Optional: change the dev server port
+PORT=5173
+
+# Optional: CORS/allowed origin in prod (adjust for your domain)
+ORIGIN="http://localhost:5173"
+```
+
+### 3) Install dependencies
+
+```bash
+npm install
+```
+
+If you use **Nix**:
+
+```bash
+nix develop
+npm install
+```
+
+### 4) Setup the database
+
+```bash
+npx prisma generate
+npx prisma migrate dev --name init
+```
+
+### 5) Run in development
+
+```bash
+npm run dev
+# then open the printed URL (http://localhost:5173)
+```
+
+
+## Build & run (production)
 
 ```bash
 nix run .
 ```
 
----
+> When deploying, run **database migrations** in your release step:
+>
+> ```bash
+> npx prisma migrate deploy
+> ```
 
-### 🔁 Reverse Proxy (Caddy)
 
-```Caddyfile
-boued.example.com {
-	reverse_proxy localhost:6001
-}
+## Deployment tips
+As a nixos module:
+
+Add in flake.nix inputs:
+```nix
+boued.url = "github:MathieuMoalic/boued";
 ```
 
----
+Using with caddy:
+```nix
+{...}: let
+  port = 10025;
+in {
+  services.caddy = {
+    virtualHosts = {
+      "boued.matmoa.eu" = {
+        extraConfig = ''
+          reverse_proxy localhost:${toString port}
+        '';
+      };
+    };
+  };
+  services.boued = {
+    enable = true;
+    port = port;
+  };
+}
 
-## ⚙️ Stack
+```
 
-- **Backend**: Python, FastAPI, SQLModel, WebSocket
-- **Frontend**: SvelteKit, TailwindCSS
-- **DB**: SQLite
-- **Auth**: JWT-based
+## License
+
+GPL-3.0 — see [`LICENSE`](./LICENSE). ([GitHub][1])
