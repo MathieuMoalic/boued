@@ -9,7 +9,9 @@ export const load: PageServerLoad = async ({ locals, url, depends }) => {
     depends('app:items');
 
     const items = await prisma.item.findMany({});
-    const categories = await prisma.category.findMany();
+    const categories = await prisma.category.findMany({
+        orderBy: { order: 'asc' },
+    });
     return { items, categories };
 };
 
