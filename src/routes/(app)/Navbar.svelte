@@ -57,7 +57,7 @@
     <div class="relative" use:clickOutside>
         <button
             type="button"
-            class="m-2 inline-flex h-10 w-10 items-center justify-center rounded-lg border border-primary-900 bg-primary-600 text-zinc-900 shadow-sm backdrop-blur"
+            class="m-2 inline-flex h-10 w-10 items-center justify-center rounded border bg-primary-900 border-gray-600 text-primary-200 shadow-sm backdrop-blur"
             aria-label="Open menu"
             aria-expanded={open}
             aria-controls="main-menu"
@@ -78,7 +78,7 @@
                 id="main-menu"
                 role="menu"
                 transition:scale={{ duration: 120 }}
-                class="absolute right-2 top-12 min-w-36 overflow-hidden rounded-xl border border-primary-900 bg-primary-600 text-zinc-900 shadow-xl"
+                class="absolute right-2 top-14 min-w-36 overflow-hidden border bg-primary-900 border-gray-600 rounded text-primary-200 shadow-xl"
                 style="transform-origin: top right;"
             >
                 <li role="none">
