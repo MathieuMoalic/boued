@@ -24,6 +24,9 @@
     export let categories: { id: number; name: string }[] = [];
     export let mode: "create" | "edit" = "create";
 
+    let categoryGroup: string =
+        item.category_id === null ? "" : String(item.category_id);
+
     const handleEnhance: SubmitFunction = () => {
         return async ({ result }) => {
             switch (result.type) {
@@ -107,21 +110,22 @@
         </div>
 
         <div>
-            <span class="block text-sm font-medium text-primary-200">
-                Category
-            </span>
+            <span class="block text-sm font-medium text-primary-200"
+                >Category</span
+            >
             <div class="grid grid-cols-3 gap-1 mt-1">
+                <!-- None -->
                 <label
                     class={`inline-flex items-center justify-center p-1 cursor-pointer rounded text-primary-200 max-w-[120px] truncate
-            ${item.category_id === null ? "bg-primary-600" : "bg-primary-800 hover:bg-primary-700"}`}
+        ${categoryGroup === "" ? "bg-primary-600" : "bg-primary-800 hover:bg-primary-700"}`}
                     title="None"
                 >
                     <input
                         type="radio"
-                        value=""
-                        on:click={() => (item.category_id = null)}
                         name="category"
-                        class="hidden"
+                        value=""
+                        bind:group={categoryGroup}
+                        class="sr-only"
                     />
                     <span class="truncate w-full text-center">None</span>
                 </label>
@@ -129,21 +133,22 @@
                 {#each categories as category}
                     <label
                         class={`inline-flex items-center justify-center p-1 cursor-pointer rounded text-primary-200 max-w-[120px] truncate
-                ${category.id == item.category_id ? "bg-primary-600" : "bg-primary-800 hover:bg-primary-700"}`}
+          ${String(category.id) === categoryGroup ? "bg-primary-600" : "bg-primary-800 hover:bg-primary-700"}`}
                         title={category.name}
                     >
                         <input
                             type="radio"
-                            value={category.id}
-                            on:click={() => (item.category_id = category.id)}
                             name="category"
-                            class="hidden"
+                            value={String(category.id)}
+                            bind:group={categoryGroup}
+                            class="sr-only"
                         />
-                        <span class="truncate w-full text-center">
-                            {category.name}
-                        </span>
+                        <span class="truncate w-full text-center"
+                            >{category.name}</span
+                        >
                     </label>
                 {/each}
+
                 <label
                     class="inline-flex items-center justify-center p-1 cursor-pointer rounded text-primary-200 max-w-[120px] truncate bg-primary-800 hover:bg-primary-700"
                 >
