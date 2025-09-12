@@ -21,7 +21,7 @@
     package = pkgs.buildNpmPackage ({
         pname = "boued";
         version = "2.0.0";
-        npmDepsHash = "sha256-lVP4mnUBSj72MEtIJpE1/etS+BDbYIHLeQzpjccjrII=";
+        npmDepsHash = "sha256-vBefyHcKlpIWSStulMhDVJ/rIMQ8De9Vdm6zldwn4SU=";
         src = ./.;
         NODE_ENV = "production";
 
