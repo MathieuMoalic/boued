@@ -35,7 +35,10 @@ export const actions: Actions = {
             return fail(400, { username, error: 'Incorrect username or password' });
         }
 
-        await prisma.userSession.deleteMany({ where: { user_id: user.id } });
+        await prisma.userSession.deleteMany({
+            where: { user_id: user.id, expiresAt: { lt: new Date() } }
+        });
+
 
         const sessionId = randomUUID(); // Generate a secure random session ID
         const expiresAt = new Date(Date.now() + SESSION_DURATION_MS);
@@ -52,11 +55,12 @@ export const actions: Actions = {
             return fail(500, { username, error: 'Login failed. Please try again.' });
         }
 
+        const isProd = process.env.NODE_ENV === 'production';
         cookies.set(SESSION_COOKIE_NAME, sessionId, {
             path: '/',               // Available on entire site
             httpOnly: true,          // Not accessible via client-side JS
             sameSite: 'lax',         // Good default for security
-            secure: false, // Only send over HTTPS in production
+            secure: isProd, // Only send over HTTPS in production
             maxAge: SESSION_DURATION_MS / 1000 // maxAge is in seconds
         });
 
